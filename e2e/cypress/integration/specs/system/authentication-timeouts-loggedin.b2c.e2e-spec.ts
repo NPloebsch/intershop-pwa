@@ -42,7 +42,6 @@ describe('Logged in Sleeping User', () => {
         });
 
         cy.wait(5000);
-        cy.window().screenshot();
       });
       at(LoginPage, page => {
         page.header.myAccountLink.should('not.have.text', `${_.user.firstName} ${_.user.lastName}`);
@@ -69,15 +68,13 @@ describe('Logged in Sleeping User', () => {
           response: 'Bad Request (AuthenticationTokenInvalid)',
         })
         .as('invalid');
-      at(MyAccountPage, page => {
-        page.navigateToAddresses();
+      at(MyAccountPage, () => {
         cy.wait('@invalid');
         cy.route({
           method: 'GET',
           url: `**`,
         });
         cy.wait(5000);
-        cy.window().screenshot();
       });
       at(LoginPage, page => {
         page.header.myAccountLink.should('not.have.text', `${_.user.firstName} ${_.user.lastName}`);

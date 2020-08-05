@@ -12,12 +12,13 @@ import { AppearanceModule } from './appearance.module';
 import { ConfigurationModule } from './configuration.module';
 import { ExtrasModule } from './extras.module';
 import { FeatureToggleModule } from './feature-toggle.module';
-import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { IdentityProviderModule } from './identity-provider.module';
 import { ICMErrorMapperInterceptor } from './interceptors/icm-error-mapper.interceptor';
 import { MockInterceptor } from './interceptors/mock.interceptor';
 import { InternationalizationModule } from './internationalization.module';
 import { StateManagementModule } from './state-management.module';
 import { DefaultErrorhandler } from './utils/default-error-handler';
+import { IdentityProviderInterceptor } from './utils/identity-provider/identity-provider.interceptor';
 import { ModuleLoaderService } from './utils/module-loader/module-loader.service';
 
 @NgModule({
@@ -29,6 +30,7 @@ import { ModuleLoaderService } from './utils/module-loader/module-loader.service
     FeatureToggleModule,
     FormlyModule.forRoot(),
     HttpClientModule,
+    IdentityProviderModule,
     InternationalizationModule,
     NgxCookieBannerModule.forRoot({
       cookieName: 'cookieLawSeen',
@@ -38,7 +40,11 @@ import { ModuleLoaderService } from './utils/module-loader/module-loader.service
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ICMErrorMapperInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: IdentityProviderInterceptor,
+      multi: true,
+    },
     { provide: HTTP_INTERCEPTORS, useClass: MockInterceptor, multi: true },
     { provide: ErrorHandler, useClass: DefaultErrorhandler },
   ],

@@ -7,6 +7,8 @@ import { ServerHtmlDirective } from 'ish-core/directives/server-html.directive';
 import { Customer } from 'ish-core/models/customer/customer.model';
 import { User } from 'ish-core/models/user/user.model';
 import { DatePipe } from 'ish-core/pipes/date.pipe';
+import { IdentityProviderCapabilityDirective } from 'ish-core/utils/identity-provider/identity-provider-capability.directive';
+import { IdentityProviderFactory } from 'ish-core/utils/identity-provider/identity-provider.factory';
 
 import { AccountProfileComponent } from './account-profile.component';
 
@@ -22,11 +24,20 @@ describe('Account Profile Component', () => {
     await TestBed.configureTestingModule({
       declarations: [
         AccountProfileComponent,
+        IdentityProviderCapabilityDirective,
         MockComponent(FaIconComponent),
         MockDirective(ServerHtmlDirective),
         MockPipe(DatePipe),
       ],
       imports: [TranslateModule.forRoot()],
+      providers: [
+        {
+          provide: IdentityProviderFactory,
+          useValue: {
+            getInstance: () => ({ getCapabilities: () => ({ editEmail: true, editPassword: true }) }),
+          } as IdentityProviderFactory,
+        },
+      ],
     }).compileComponents();
   });
 

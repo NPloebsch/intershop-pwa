@@ -3,22 +3,18 @@ import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { routerNavigatedAction } from '@ngrx/router-store';
 import { Store, select } from '@ngrx/store';
-import { EMPTY, race, timer } from 'rxjs';
+import { EMPTY } from 'rxjs';
 import {
   catchError,
   concatMap,
   concatMapTo,
-  debounce,
-  debounceTime,
   exhaustMap,
   filter,
-  first,
   map,
   mapTo,
   mergeMap,
   sample,
   switchMap,
-  switchMapTo,
   tap,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -47,11 +43,9 @@ import {
   loginUser,
   loginUserFail,
   loginUserSuccess,
-  logoutUser,
   requestPasswordReminder,
   requestPasswordReminderFail,
   requestPasswordReminderSuccess,
-  resetAPIToken,
   setPGID,
   updateCustomer,
   updateCustomerFail,
@@ -100,28 +94,6 @@ export class UserEffects {
         )
       )
     )
-  );
-
-  goToLoginAfterLogoutBySessionTimeout$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(resetAPIToken),
-        switchMapTo(
-          race(
-            // wait for immediate LogoutUser
-            this.actions$.pipe(ofType(logoutUser)),
-            // or stop flow
-            timer(1000).pipe(switchMapTo(EMPTY))
-          )
-        ),
-        debounce(() => this.actions$.pipe(debounceTime(2000), first())),
-        tap(() => {
-          this.router.navigate(['/login'], {
-            queryParams: { returnUrl: this.router.url, messageKey: 'session_timeout' },
-          });
-        })
-      ),
-    { dispatch: false }
   );
 
   /**
@@ -247,8 +219,7 @@ export class UserEffects {
   loadUserByAPIToken$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadUserByAPIToken),
-      mapToPayloadProperty('apiToken'),
-      concatMap(apiToken => this.userService.signinUserByToken(apiToken).pipe(map(loginUserSuccess)))
+      concatMap(() => this.userService.signinUserByToken().pipe(map(loginUserSuccess)))
     )
   );
 
