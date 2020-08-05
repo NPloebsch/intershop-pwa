@@ -13,6 +13,7 @@ import { Credentials } from 'ish-core/models/credentials/credentials.model';
 import { Customer, CustomerRegistrationType, CustomerUserType } from 'ish-core/models/customer/customer.model';
 import { PasswordReminder } from 'ish-core/models/password-reminder/password-reminder.model';
 import { User } from 'ish-core/models/user/user.model';
+import { AddressService } from 'ish-core/services/address/address.service';
 import { PaymentService } from 'ish-core/services/payment/payment.service';
 import { PersonalizationService } from 'ish-core/services/personalization/personalization.service';
 import { UserService } from 'ish-core/services/user/user.service';
@@ -103,6 +104,7 @@ describe('User Effects', () => {
         { provide: UserService, useFactory: () => instance(userServiceMock) },
         { provide: PaymentService, useFactory: () => instance(paymentServiceMock) },
         { provide: PersonalizationService, useFactory: () => instance(mock(PersonalizationService)) },
+        { provide: AddressService, useFactory: () => instance(mock(AddressService)) },
       ],
     });
 

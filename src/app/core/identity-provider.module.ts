@@ -1,8 +1,10 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { Store, select } from '@ngrx/store';
+import { OAuthModule } from 'angular-oauth2-oidc';
 import { first, tap } from 'rxjs/operators';
 
 import { getIdentityProvider } from './store/core/configuration';
+import { Auth0IdentityProvider } from './utils/identity-provider/auth0.identity-provider';
 import { ICMIdentityProvider } from './utils/identity-provider/icm.identity-provider';
 import {
   IDENTITY_PROVIDER_IMPLEMENTOR,
@@ -23,6 +25,7 @@ export function identityProviderFactoryInitializer(store: Store, identityProvide
 }
 
 @NgModule({
+  imports: [OAuthModule.forRoot({ resourceServer: { sendAccessToken: false } })],
   providers: [
     {
       provide: APP_INITIALIZER,
@@ -36,6 +39,14 @@ export function identityProviderFactoryInitializer(store: Store, identityProvide
       useValue: {
         type: 'ICM',
         implementor: ICMIdentityProvider,
+      },
+    },
+    {
+      provide: IDENTITY_PROVIDER_IMPLEMENTOR,
+      multi: true,
+      useValue: {
+        type: 'auth0',
+        implementor: Auth0IdentityProvider,
       },
     },
   ],

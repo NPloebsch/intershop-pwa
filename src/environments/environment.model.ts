@@ -1,5 +1,6 @@
 import { Locale } from 'ish-core/models/locale/locale.model';
 import { DeviceType, ViewType } from 'ish-core/models/viewtype/viewtype.types';
+import { Auth0Config } from 'ish-core/utils/identity-provider/auth0.identity-provider';
 
 import { TactonConfig } from '../app/extensions/tacton/models/tacton-config/tacton-config.model';
 
@@ -86,10 +87,12 @@ export interface Environment {
 
   // client-side configuration for identity providers
   identityProviders?: {
-    [name: string]: {
-      type: string;
-      [key: string]: unknown;
-    };
+    [name: string]:
+      | {
+          type: string;
+          [key: string]: unknown;
+        }
+      | Auth0Config;
   };
 }
 

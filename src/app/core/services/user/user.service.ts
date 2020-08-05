@@ -2,8 +2,8 @@ import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import b64u from 'b64u';
 import { pick } from 'lodash-es';
-import { EMPTY, Observable, of, throwError } from 'rxjs';
-import { catchError, concatMap, first, map, withLatestFrom } from 'rxjs/operators';
+import { EMPTY, Observable, of, throwError, timer } from 'rxjs';
+import { catchError, concatMap, first, map, retryWhen, switchMap, withLatestFrom } from 'rxjs/operators';
 
 import { AppFacade } from 'ish-core/facades/app.facade';
 import { Address } from 'ish-core/models/address/address.model';
@@ -72,6 +72,13 @@ export class UserService {
     return this.apiService
       .get<CustomerData>('customers/-', { skipApiErrorHandling: true, runExclusively: true })
       .pipe(
+        retryWhen(errors =>
+          errors.pipe(
+            switchMap((error: { status: number; code: string }) =>
+              error.status === 401 && error.code === 'user.not.authenticated' ? timer(1000) : throwError(error)
+            )
+          )
+        ),
         withLatestFrom(this.appFacade.isAppTypeREST$),
         concatMap(([data, isAppTypeRest]) =>
           // ToDo: #IS-30018 use the customer type for this decision
