@@ -25,7 +25,7 @@ FROM node:12-alpine
 COPY --from=buildstep /workspace/dist /dist
 ARG displayVersion=
 LABEL displayVersion="${displayVersion}"
-ENV DISPLAY_VERSION=${displayVersion}
+ENV DISPLAY_VERSION=${displayVersion} ICM_IDENTITY_PROVIDER=Auth0 IDENTITY_PROVIDERS='{ "Auth0": { "type": "auth0", "domain": "dev-9pqwi8uh.eu.auth0.com", "clientID": "V2xvLUo3YSfGdCmJz7u381dSevoVkOso" } }'
 ARG configuration=production
 LABEL configuration="${configuration}"
 EXPOSE 4200
