@@ -7,6 +7,7 @@ import { instance, mock } from 'ts-mockito';
 import { ServerHtmlDirective } from 'ish-core/directives/server-html.directive';
 import { AppFacade } from 'ish-core/facades/app.facade';
 import { findAllCustomElements } from 'ish-core/utils/dev/html-query-utils';
+import { CookiesBannerComponent } from 'ish-shell/application/cookies-banner/cookies-banner.component';
 
 import { AppComponent } from './app.component';
 import { FooterComponent } from './shell/footer/footer/footer.component';
@@ -23,6 +24,7 @@ describe('App Component', () => {
     await TestBed.configureTestingModule({
       declarations: [
         AppComponent,
+        MockComponent(CookiesBannerComponent),
         MockComponent(FooterComponent),
         MockComponent(HeaderComponent),
         MockDirective(ServerHtmlDirective),
