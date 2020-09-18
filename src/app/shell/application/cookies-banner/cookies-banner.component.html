@@ -1,7 +1,7 @@
 <div *ngIf="showBanner" class="cookies-banner">
   <div [ishServerHtml]="'cookie_consent.banner.text' | translate"></div>
 
-  <button type="button" class="btn btn-light float-right">
+  <button type="button" class="btn btn-light float-right" (click)="acceptAll()">
     {{ 'cookie_consent.banner.accept_all' | translate }}
   </button>
 
