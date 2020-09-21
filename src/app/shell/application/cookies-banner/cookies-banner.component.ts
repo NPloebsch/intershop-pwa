@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
-import { CookiesService } from 'ish-core/services/cookies/cookies.service';
+import { COOKIE_CONSENT_OPTIONS, CookiesService } from 'ish-core/services/cookies/cookies.service';
 
 /**
  * Cookies Banner Component
@@ -11,31 +11,28 @@ import { CookiesService } from 'ish-core/services/cookies/cookies.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CookiesBannerComponent implements OnInit {
-  showBanner = true;
+  showBanner = false;
 
   // tslint:disable-next-line:no-intelligence-in-artifacts
   constructor(private cookiesService: CookiesService) {}
 
   ngOnInit() {
-    console.log('cookies banner inited', this.cookiesService.get('cookie-consent'));
-
-    if (this.cookiesService.get('cookie-consent')) {
-      this.showBanner = false;
-    }
-
-    // this.cookieData = JSON.parse(this.cookieFacade.cookiesService.get('cookie-consent') || 'null');
-    // this.showBannerIfNeeded();
+    this.showBannerIfNecessary();
   }
-  // showBannerIfNeeded() {
-  //   if (this.cookieData?.updatedAt) {
-  //     const updatedAtCookie = new Date(this.cookieData.updatedAt).getTime();
-  //     const updatedAtOptions = new Date(this.options.updatedAt).getTime();
 
-  //     if (updatedAtOptions - updatedAtCookie < 0) {
-  //       this.showBanner = false;
-  //     }
-  //   }
-  // }
+  /**
+   * Shows the cookie consent banner if the cookie consent was not given
+   * or if the cookie options are newer than the given cookie consent.
+   */
+  showBannerIfNecessary() {
+    const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookie-consent') || 'null');
+    if (
+      !cookieConsentSettings ||
+      new Date(COOKIE_CONSENT_OPTIONS.updatedAt).getTime() - new Date(cookieConsentSettings.updatedAt).getTime() > 0
+    ) {
+      this.showBanner = true;
+    }
+  }
 
   acceptAll() {
     this.cookiesService.setCookiesPreferences(['required', 'functional', 'tracking']);
