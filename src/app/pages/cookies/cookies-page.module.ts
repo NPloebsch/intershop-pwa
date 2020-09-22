@@ -1,18 +1,19 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
-import { CookiesGuard } from 'ish-core/guards/cookies.guard';
-import { CookiesModalComponent } from 'ish-shared/components/cookies/cookies-modal/cookies-modal.component';
-import { SharedModule } from 'ish-shared/shared.module';
+import { CookiesModalComponent } from './cookies-modal/cookies-modal.component';
+import { CookiesPageGuard } from './cookies-page.guard';
 
 const cookiesPageRoutes: Routes = [
   {
     path: '',
     children: [],
-    canActivate: [CookiesGuard],
+    canActivate: [CookiesPageGuard],
     data: {
       meta: {
-        title: 'account.login.link',
+        title: 'cookie_consent.cookie_preferences',
         robots: 'noindex, nofollow',
       },
     },
@@ -20,7 +21,8 @@ const cookiesPageRoutes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(cookiesPageRoutes), SharedModule],
+  imports: [CommonModule, RouterModule.forChild(cookiesPageRoutes), TranslateModule],
+  providers: [CookiesPageGuard],
   declarations: [CookiesModalComponent],
 })
 export class CookiesPageModule {}

@@ -3,10 +3,10 @@ import { CanActivate, NavigationEnd, Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { filter, first } from 'rxjs/operators';
 
-import { CookiesModalComponent } from 'ish-shared/components/cookies/cookies-modal/cookies-modal.component';
+import { CookiesModalComponent } from './cookies-modal/cookies-modal.component';
 
-@Injectable({ providedIn: 'root' })
-export class CookiesGuard implements CanActivate {
+@Injectable()
+export class CookiesPageGuard implements CanActivate {
   private currentDialog: NgbModalRef;
 
   constructor(private modalService: NgbModal, private router: Router) {}

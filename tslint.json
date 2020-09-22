@@ -569,7 +569,7 @@
           "^.*/src/app/shell/(header|footer|application)/([a-z][a-z0-9-]+)/\\2\\.component\\.ts$",
           "^.*/src/app/shell/[a-z][a-z0-9-]+/configurations/.*\\.ts$",
           // specific (lazy loaded) page modules
-          "^.*(/src/app|/src/app/extensions/[a-z][a-z0-9-]+|projects/[a-z][a-z0-9-]+/src/app)/pages/([a-z][a-z0-9-]+)/\\2-page\\.(module|component)\\.ts$",
+          "^.*(/src/app|/src/app/extensions/[a-z][a-z0-9-]+|projects/[a-z][a-z0-9-]+/src/app)/pages/([a-z][a-z0-9-]+)/\\2-page\\.(module|component|guard)\\.ts$",
           "^.*(/src/app|/src/app/extensions/[a-z][a-z0-9-]+|projects/[a-z][a-z0-9-]+/src/app)/pages/[a-z][a-z0-9-]+/([a-z][a-z0-9-]+)/\\2\\.component\\.ts$",
           "^.*/src/app/extensions/([a-z][a-z0-9-]+)/pages/\\1(.*)-routing\\.module\\.ts$",
           "^.*/projects/([a-z][a-z0-9-]+)/src/app/pages/\\1-routing\\.module\\.ts$",
@@ -646,6 +646,10 @@
           {
             "name": "^([A-Z].*)Directive$",
             "file": ".*/directives/<kebab>\\.directive\\.ts$"
+          },
+          {
+            "name": "^([A-Z].*)PageGuard$",
+            "file": ".*/pages/<kebab>/<kebab>-page\\.guard\\.ts$"
           },
           {
             "name": "^([A-Z].*)Guard$",
