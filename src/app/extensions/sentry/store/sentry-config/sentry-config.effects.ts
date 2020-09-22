@@ -4,7 +4,8 @@ import { TransferState } from '@angular/platform-browser';
 import { Actions, createEffect } from '@ngrx/effects';
 import { Action, Store, select } from '@ngrx/store';
 import * as Sentry from '@sentry/browser';
-import { distinctUntilChanged, filter, map, switchMapTo, take, takeWhile, tap, withLatestFrom } from 'rxjs/operators';
+import { iif } from 'rxjs';
+import { distinctUntilChanged, filter, map, take, takeWhile, tap, withLatestFrom } from 'rxjs/operators';
 
 import { DISPLAY_VERSION } from 'ish-core/configurations/state-keys';
 import { FeatureToggleService } from 'ish-core/feature-toggle.module';
@@ -43,17 +44,15 @@ export class SentryConfigEffects {
 
   configureSentry$ = createEffect(
     () =>
-      this.cookiesService.cookieLawSeen$.pipe(
-        whenTruthy(),
-        switchMapTo(
-          this.store.pipe(
-            select(getSentryDSN),
-            whenTruthy(),
-            tap(dsn => {
-              const release = this.transferState.get<string>(DISPLAY_VERSION, 'development');
-              Sentry.init({ dsn, release });
-            })
-          )
+      iif(
+        () => this.cookiesService.cookieConsentFor('tracking'),
+        this.store.pipe(
+          select(getSentryDSN),
+          whenTruthy(),
+          tap(dsn => {
+            const release = this.transferState.get<string>(DISPLAY_VERSION, 'development');
+            Sentry.init({ dsn, release });
+          })
         )
       ),
     { dispatch: false }

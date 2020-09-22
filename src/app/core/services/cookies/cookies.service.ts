@@ -1,10 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
-import { ApplicationRef, Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { CookiesOptions, CookiesService as ForeignCookiesService } from 'ngx-utils-cookies-port';
-import { ReplaySubject, timer } from 'rxjs';
-import { distinct, map, switchMap, take } from 'rxjs/operators';
-
-import { whenTruthy } from 'ish-core/utils/operators';
 
 export interface CookieConsentOptions {
   updatedAt: Date | string;
@@ -48,30 +44,7 @@ export const COOKIE_CONSENT_OPTIONS: CookieConsentOptions = {
 
 @Injectable({ providedIn: 'root' })
 export class CookiesService {
-  cookieLawSeen$ = new ReplaySubject<boolean>(1);
-
-  constructor(
-    private cookiesService: ForeignCookiesService,
-    @Inject(PLATFORM_ID) private platformId: string,
-    appRef: ApplicationRef
-  ) {
-    if (isPlatformBrowser(this.platformId)) {
-      appRef.isStable
-        .pipe(
-          whenTruthy(),
-          take(1),
-          switchMap(() =>
-            timer(0, 1000).pipe(
-              map(() => this.cookiesService.get('cookieLawSeen') === 'true'),
-              distinct()
-            )
-          )
-        )
-        .subscribe(this.cookieLawSeen$);
-    } else {
-      this.cookieLawSeen$.next(false);
-    }
-  }
+  constructor(private cookiesService: ForeignCookiesService, @Inject(PLATFORM_ID) private platformId: string) {}
 
   get(key: string): string {
     return isPlatformBrowser(this.platformId) ? this.cookiesService.get(key) : undefined;
@@ -85,11 +58,16 @@ export class CookiesService {
     this.cookiesService.put(key, value, options);
   }
 
-  setCookiesPreferences(groups: string[]) {
-    console.log('setCookiesPreferences', groups);
+  setCookiesPreferences(categories: string[]) {
+    console.log('setCookiesPreferences', categories);
     // this.deleteAllCookies();
-    this.put('cookie-consent', JSON.stringify({ updatedAt: new Date().toISOString(), enabledCookies: groups }));
-    // window.location.reload();
+    this.put('cookie-consent', JSON.stringify({ updatedAt: new Date().toISOString(), enabledCookies: categories }));
+    window.location.reload();
+  }
+
+  cookieConsentFor(category: string) {
+    const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookie-consent') || 'null');
+    return cookieConsentSettings?.enabledCookies.includes(category);
   }
 
   // deleteAllCookies() {
@@ -100,12 +78,6 @@ export class CookiesService {
   //     if (!this.options.options[0].whitelistedCookies.includes(name)) {
   //       document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
   //     }
-  //   }
-  // }
-
-  // initCookieLawSeen() {
-  //   if (this.cookieData?.enabledCookies.includes('tracking')) {
-  //     this.cookieFacade.cookiesService.cookieLawSeen$.next(true);
   //   }
   // }
 }
