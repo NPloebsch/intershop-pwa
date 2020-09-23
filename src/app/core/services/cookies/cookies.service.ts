@@ -9,9 +9,8 @@ export interface CookieConsentOptions {
     required?: boolean;
     messageKeyTitle: string;
     messageKeyContent: string;
-    features?: string[]; // todo: bind features to ids?!?
-    whitelistedCookies?: string[];
   }[];
+  allowedCookies?: string[];
 }
 
 export interface CookieConsentSettings {
@@ -27,7 +26,6 @@ export const COOKIE_CONSENT_OPTIONS: CookieConsentOptions = {
       required: true,
       messageKeyTitle: 'cookie_consent.dialog.sections.essential.title',
       messageKeyContent: 'cookie_consent.dialog.sections.essential.content',
-      whitelistedCookies: ['apiToken'],
     },
     {
       id: 'functional',
@@ -40,6 +38,7 @@ export const COOKIE_CONSENT_OPTIONS: CookieConsentOptions = {
       messageKeyContent: 'cookie_consent.dialog.sections.tracking.content',
     },
   ],
+  allowedCookies: ['apiToken', 'cookieConsent'],
 };
 
 @Injectable({ providedIn: 'root' })
@@ -60,24 +59,22 @@ export class CookiesService {
 
   setCookiesPreferences(categories: string[]) {
     console.log('setCookiesPreferences', categories);
-    // this.deleteAllCookies();
-    this.put('cookie-consent', JSON.stringify({ updatedAt: new Date().toISOString(), enabledCookies: categories }));
+    this.deleteAllCookies();
+    this.put('cookieConsent', JSON.stringify({ updatedAt: new Date().toISOString(), enabledCookies: categories }));
     window.location.reload();
   }
 
   cookieConsentFor(category: string) {
-    const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookie-consent') || 'null');
+    const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookieConsent') || 'null');
     return cookieConsentSettings?.enabledCookies.includes(category);
   }
 
-  // deleteAllCookies() {
-  //   const cookies = document.cookie.split(';');
-  //   for (const cookie of cookies) {
-  //     const eqPos = cookie.indexOf('=');
-  //     const name = (eqPos > -1 ? cookie.substr(0, eqPos) : cookie).trim();
-  //     if (!this.options.options[0].whitelistedCookies.includes(name)) {
-  //       document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  //     }
-  //   }
-  // }
+  private deleteAllCookies() {
+    const allCookies = this.cookiesService.getAll();
+    for (const cookie in allCookies) {
+      if (!COOKIE_CONSENT_OPTIONS.allowedCookies.includes(cookie)) {
+        this.cookiesService.remove(cookie);
+      }
+    }
+  }
 }

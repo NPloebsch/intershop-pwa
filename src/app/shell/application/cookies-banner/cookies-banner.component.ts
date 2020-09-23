@@ -25,7 +25,7 @@ export class CookiesBannerComponent implements OnInit {
    * or if the cookie options are newer than the given cookie consent.
    */
   showBannerIfNecessary() {
-    const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookie-consent') || 'null');
+    const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookieConsent') || 'null');
     if (
       !cookieConsentSettings ||
       new Date(COOKIE_CONSENT_OPTIONS.updatedAt).getTime() - new Date(cookieConsentSettings.updatedAt).getTime() > 0
