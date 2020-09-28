@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 
-import { COOKIE_CONSENT_OPTIONS, CookiesService } from 'ish-core/services/cookies/cookies.service';
+import { COOKIE_CONSENT_OPTIONS } from 'ish-core/configurations/injection-keys';
+import { CookieConsentOptions } from 'ish-core/models/cookies/cookies.model';
+import { CookiesService } from 'ish-core/services/cookies/cookies.service';
 
 /**
  * Cookies Banner Component
@@ -13,8 +15,11 @@ import { COOKIE_CONSENT_OPTIONS, CookiesService } from 'ish-core/services/cookie
 export class CookiesBannerComponent implements OnInit {
   showBanner = false;
 
-  // tslint:disable-next-line:no-intelligence-in-artifacts
-  constructor(private cookiesService: CookiesService) {}
+  // tslint:disable:no-intelligence-in-artifacts
+  constructor(
+    @Inject(COOKIE_CONSENT_OPTIONS) private cookieConsentOptions: CookieConsentOptions,
+    private cookiesService: CookiesService
+  ) {}
 
   ngOnInit() {
     this.showBannerIfNecessary();
@@ -28,7 +33,7 @@ export class CookiesBannerComponent implements OnInit {
     const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookieConsent') || 'null');
     if (
       !cookieConsentSettings ||
-      new Date(COOKIE_CONSENT_OPTIONS.updatedAt).getTime() - new Date(cookieConsentSettings.updatedAt).getTime() > 0
+      new Date(this.cookieConsentOptions.updatedAt).getTime() - new Date(cookieConsentSettings.updatedAt).getTime() > 0
     ) {
       this.showBanner = true;
     }

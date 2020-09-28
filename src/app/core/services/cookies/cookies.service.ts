@@ -2,48 +2,20 @@ import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { CookiesOptions, CookiesService as ForeignCookiesService } from 'ngx-utils-cookies-port';
 
-export interface CookieConsentOptions {
-  updatedAt: Date | string;
-  options: {
-    id: 'required' | 'functional' | 'tracking';
-    required?: boolean;
-    messageKeyTitle: string;
-    messageKeyContent: string;
-  }[];
-  allowedCookies?: string[];
-}
-
-export interface CookieConsentSettings {
-  updatedAt: Date | string;
-  enabledCookies: string[]; // ids 'required' | 'marketing' | 'tracking'
-}
-
-export const COOKIE_CONSENT_OPTIONS: CookieConsentOptions = {
-  updatedAt: '2020-09-21T00:00:00',
-  options: [
-    {
-      id: 'required',
-      required: true,
-      messageKeyTitle: 'cookie_consent.dialog.sections.essential.title',
-      messageKeyContent: 'cookie_consent.dialog.sections.essential.content',
-    },
-    {
-      id: 'functional',
-      messageKeyTitle: 'cookie_consent.dialog.sections.functional.title',
-      messageKeyContent: 'cookie_consent.dialog.sections.functional.content',
-    },
-    {
-      id: 'tracking',
-      messageKeyTitle: 'cookie_consent.dialog.sections.tracking.title',
-      messageKeyContent: 'cookie_consent.dialog.sections.tracking.content',
-    },
-  ],
-  allowedCookies: ['apiToken', 'cookieConsent'],
-};
+import { COOKIE_CONSENT_OPTIONS } from 'ish-core/configurations/injection-keys';
+import {
+  CookieConsentCategory,
+  CookieConsentOptions,
+  CookieConsentSettings,
+} from 'ish-core/models/cookies/cookies.model';
 
 @Injectable({ providedIn: 'root' })
 export class CookiesService {
-  constructor(private cookiesService: ForeignCookiesService, @Inject(PLATFORM_ID) private platformId: string) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: string,
+    @Inject(COOKIE_CONSENT_OPTIONS) private cookieConsentOptions: CookieConsentOptions,
+    private cookiesService: ForeignCookiesService
+  ) {}
 
   get(key: string): string {
     return isPlatformBrowser(this.platformId) ? this.cookiesService.get(key) : undefined;
@@ -57,22 +29,23 @@ export class CookiesService {
     this.cookiesService.put(key, value, options);
   }
 
-  setCookiesPreferences(categories: string[]) {
-    console.log('setCookiesPreferences', categories);
+  setCookiesPreferences(categories: CookieConsentCategory[]) {
     this.deleteAllCookies();
     this.put('cookieConsent', JSON.stringify({ updatedAt: new Date().toISOString(), enabledCookies: categories }));
     window.location.reload();
   }
 
-  cookieConsentFor(category: string) {
-    const cookieConsentSettings = JSON.parse(this.cookiesService.get('cookieConsent') || 'null');
+  cookieConsentFor(category: CookieConsentCategory) {
+    const cookieConsentSettings = JSON.parse(
+      this.cookiesService.get('cookieConsent') || 'null'
+    ) as CookieConsentSettings;
     return cookieConsentSettings?.enabledCookies.includes(category);
   }
 
   private deleteAllCookies() {
     const allCookies = this.cookiesService.getAll();
     for (const cookie in allCookies) {
-      if (!COOKIE_CONSENT_OPTIONS.allowedCookies.includes(cookie)) {
+      if (!this.cookieConsentOptions.allowedCookies.includes(cookie)) {
         this.cookiesService.remove(cookie);
       }
     }

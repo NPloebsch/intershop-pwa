@@ -1,7 +1,10 @@
 import { PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { CookiesService as ForeignCookiesService } from 'ngx-utils-cookies-port';
-import { anything, instance, mock, verify } from 'ts-mockito';
+import { instance, mock, verify } from 'ts-mockito';
+
+import { COOKIE_CONSENT_OPTIONS } from 'ish-core/configurations/injection-keys';
 
 import { CookiesService } from './cookies.service';
 
@@ -12,8 +15,27 @@ describe('Cookies Service', () => {
   beforeEach(() => {
     foreignCookiesServiceMock = mock(ForeignCookiesService);
     TestBed.configureTestingModule({
+      imports: [BrowserTransferStateModule],
       providers: [
         { provide: PLATFORM_ID, useValue: 'browser' },
+        {
+          provide: COOKIE_CONSENT_OPTIONS,
+          useValue: {
+            options: [
+              {
+                id: 'required',
+                messageKeyTitle: 'required.title',
+                messageKeyContent: 'required.content',
+                required: true,
+              },
+              {
+                id: 'functional',
+                messageKeyTitle: 'functional.title',
+                messageKeyContent: 'functional.content',
+              },
+            ],
+          },
+        },
         { provide: ForeignCookiesService, useFactory: () => instance(foreignCookiesServiceMock) },
       ],
     });
@@ -33,14 +55,6 @@ describe('Cookies Service', () => {
     setTimeout(() => {
       cookiesService.remove('dummy');
       verify(foreignCookiesServiceMock.remove('dummy')).once();
-      done();
-    }, 2000);
-  });
-
-  it('should call put of underlying implementation', done => {
-    setTimeout(() => {
-      cookiesService.put('dummy', 'value');
-      verify(foreignCookiesServiceMock.put('dummy', anything(), anything())).once();
       done();
     }, 2000);
   });

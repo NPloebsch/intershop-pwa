@@ -1,15 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 
-import {
-  COOKIE_CONSENT_OPTIONS,
-  CookieConsentSettings,
-  CookiesService,
-} from 'ish-core/services/cookies/cookies.service';
+import { COOKIE_CONSENT_OPTIONS } from 'ish-core/configurations/injection-keys';
+import { CookieConsentOptions, CookieConsentSettings } from 'ish-core/models/cookies/cookies.model';
+import { CookiesService } from 'ish-core/services/cookies/cookies.service';
 
 /**
- * Cookie Modal Component
+ * Cookies Modal Component
  */
-// tslint:disable:no-intelligence-in-artifacts
 @Component({
   selector: 'ish-cookies-modal',
   templateUrl: './cookies-modal.component.html',
@@ -18,18 +15,20 @@ import {
 export class CookiesModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
 
-  cookieConsentOptions = COOKIE_CONSENT_OPTIONS;
   cookieConsentSettings?: CookieConsentSettings;
   selectedIds = {};
 
-  // tslint:disable-next-line:no-intelligence-in-artifacts
-  constructor(private cookiesService: CookiesService) {}
+  // tslint:disable:no-intelligence-in-artifacts
+  constructor(
+    @Inject(COOKIE_CONSENT_OPTIONS) public cookieConsentOptions: CookieConsentOptions,
+    private cookiesService: CookiesService
+  ) {}
 
   ngOnInit() {
     this.cookieConsentSettings = JSON.parse(this.cookiesService.get('cookieConsent') || 'null');
-    COOKIE_CONSENT_OPTIONS.options.map(x =>
-      x.required || this.cookieConsentSettings?.enabledCookies.includes(x.id)
-        ? (this.selectedIds[x.id] = true)
+    this.cookieConsentOptions.options.map(option =>
+      option.required || this.cookieConsentSettings?.enabledCookies.includes(option.id)
+        ? (this.selectedIds[option.id] = true)
         : undefined
     );
   }

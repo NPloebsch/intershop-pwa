@@ -1,3 +1,4 @@
+import { CookieConsentOptions } from 'ish-core/models/cookies/cookies.model';
 import { Locale } from 'ish-core/models/locale/locale.model';
 import { DeviceType, ViewType } from 'ish-core/models/viewtype/viewtype.types';
 
@@ -80,6 +81,9 @@ export interface Environment {
   // configuration of the styling theme ('default' if not configured)
   // format: 'themeName|themeColor' e.g. theme: 'blue|688dc3',
   theme?: string;
+
+  // cookie consent options
+  cookieConsentOptions: CookieConsentOptions;
 }
 
 export const ENVIRONMENT_DEFAULTS: Environment = {
@@ -111,4 +115,26 @@ export const ENVIRONMENT_DEFAULTS: Environment = {
     { lang: 'de_DE', currency: 'EUR', value: 'de', displayName: 'German', displayLong: 'German (Germany)' },
     { lang: 'fr_FR', currency: 'EUR', value: 'fr', displayName: 'French', displayLong: 'French (France)' },
   ],
+  cookieConsentOptions: {
+    options: [
+      {
+        id: 'required',
+        messageKeyTitle: 'cookie_consent.dialog.sections.essential.title',
+        messageKeyContent: 'cookie_consent.dialog.sections.essential.content',
+        required: true,
+      },
+      {
+        id: 'functional',
+        messageKeyTitle: 'cookie_consent.dialog.sections.functional.title',
+        messageKeyContent: 'cookie_consent.dialog.sections.functional.content',
+      },
+      {
+        id: 'tracking',
+        messageKeyTitle: 'cookie_consent.dialog.sections.tracking.title',
+        messageKeyContent: 'cookie_consent.dialog.sections.tracking.content',
+      },
+    ],
+    allowedCookies: ['apiToken', 'cookieConsent'],
+    updatedAt: '2020-09-21T00:00:00',
+  },
 };
