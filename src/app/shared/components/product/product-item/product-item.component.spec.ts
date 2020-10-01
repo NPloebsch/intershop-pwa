@@ -3,6 +3,7 @@ import { MockComponent } from 'ng-mocks';
 import { of } from 'rxjs';
 import { anything, capture, instance, mock, spy, verify, when } from 'ts-mockito';
 
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
 import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
 import { LoadingComponent } from 'ish-shared/components/common/loading/loading.component';
@@ -16,9 +17,11 @@ describe('Product Item Component', () => {
   let fixture: ComponentFixture<ProductItemComponent>;
   let element: HTMLElement;
   let shoppingFacade: ShoppingFacade;
+  let context: ProductContextFacade;
 
   beforeEach(async () => {
     shoppingFacade = mock(ShoppingFacade);
+    context = mock(ProductContextFacade);
     await TestBed.configureTestingModule({
       declarations: [
         MockComponent(LoadingComponent),
@@ -27,7 +30,11 @@ describe('Product Item Component', () => {
         ProductItemComponent,
       ],
       providers: [{ provide: ShoppingFacade, useFactory: () => instance(shoppingFacade) }],
-    }).compileComponents();
+    })
+      .overrideComponent(ProductItemComponent, {
+        set: { providers: [{ provide: ProductContextFacade, useFactory: () => instance(context) }] },
+      })
+      .compileComponents();
   });
 
   beforeEach(() => {
@@ -55,7 +62,7 @@ describe('Product Item Component', () => {
           },
         ],
       } as VariationProductView;
-      when(shoppingFacade.product$(anything(), anything())).thenReturn(of(variation));
+      when(context.select('product')).thenReturn(of(variation));
     });
 
     it('should trigger add product to cart with right sku', () => {
@@ -63,10 +70,9 @@ describe('Product Item Component', () => {
 
       component.addToBasket(3);
 
-      verify(shoppingFacade.addProductToBasket(anything(), anything())).once();
-      expect(capture(shoppingFacade.addProductToBasket).last()).toMatchInlineSnapshot(`
+      verify(context.addToBasket(anything())).once();
+      expect(capture(context.addToBasket).last()).toMatchInlineSnapshot(`
         Array [
-          "sku",
           3,
         ]
       `);
@@ -91,10 +97,9 @@ describe('Product Item Component', () => {
         component.replaceVariation({ selection: { HDD: '256' } });
         component.addToBasket(4);
 
-        verify(shoppingFacade.addProductToBasket(anything(), anything())).once();
-        expect(capture(shoppingFacade.addProductToBasket).last()).toMatchInlineSnapshot(`
+        verify(context.addToBasket(anything())).once();
+        expect(capture(context.addToBasket).last()).toMatchInlineSnapshot(`
           Array [
-            "skuV2",
             4,
           ]
         `);

@@ -5,6 +5,7 @@ import { debounce, filter, map, switchMap, tap } from 'rxjs/operators';
 
 import { ProductListingID } from 'ish-core/models/product-listing/product-listing.model';
 import { ProductCompletenessLevel, ProductHelper } from 'ish-core/models/product/product.model';
+import { selectRouteParam } from 'ish-core/store/core/router';
 import { addProductToBasket } from 'ish-core/store/customer/basket';
 import {
   getCategory,
@@ -33,7 +34,6 @@ import {
   getProductLinks,
   getProductVariationOptions,
   getProducts,
-  getSelectedProduct,
   getSelectedProductVariationOptions,
   loadProductIfNotLoaded,
   loadProductLinks,
@@ -70,11 +70,8 @@ export class ShoppingFacade {
 
   // PRODUCT
 
-  selectedProduct$ = this.store.pipe(select(getSelectedProduct));
+  selectedProductId$ = this.store.pipe(select(selectRouteParam('sku')));
   selectedProductVariationOptions$ = this.store.pipe(select(getSelectedProductVariationOptions));
-  productDetailLoading$ = this.selectedProduct$.pipe(
-    map(p => !ProductHelper.isReadyForDisplay(p, ProductCompletenessLevel.Detail))
-  );
 
   product$(sku: string | Observable<string>, level: ProductCompletenessLevel) {
     return toObservable(sku).pipe(

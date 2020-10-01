@@ -4,6 +4,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 
 import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { ProductView } from 'ish-core/models/product-view/product-view.model';
+import { ProductCompletenessLevel } from 'ish-core/models/product/product.model';
 import { whenTruthy } from 'ish-core/utils/operators';
 import { ModalDialogComponent } from 'ish-shared/components/common/modal-dialog/modal-dialog.component';
 
@@ -32,7 +33,10 @@ export class ConfigurePageComponent implements OnInit, OnDestroy {
   constructor(private tactonFacade: TactonFacade, private shoppingFacade: ShoppingFacade) {}
 
   ngOnInit() {
-    this.product$ = this.shoppingFacade.selectedProduct$;
+    this.product$ = this.shoppingFacade.product$(
+      this.shoppingFacade.selectedProductId$,
+      ProductCompletenessLevel.Detail
+    );
     this.state$ = this.tactonFacade.configureProduct$;
     this.step$ = this.tactonFacade.currentStep$;
     this.loading$ = this.tactonFacade.loading$;

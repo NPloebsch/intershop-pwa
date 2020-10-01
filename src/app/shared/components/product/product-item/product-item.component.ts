@@ -12,13 +12,14 @@ import {
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { filter, startWith, take, takeUntil } from 'rxjs/operators';
 
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
 import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { Category } from 'ish-core/models/category/category.model';
 import { ProductVariationHelper } from 'ish-core/models/product-variation/product-variation.helper';
 import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
 import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
 import { ProductView, VariationProductView } from 'ish-core/models/product-view/product-view.model';
-import { ProductCompletenessLevel, ProductHelper } from 'ish-core/models/product/product.model';
+import { ProductHelper } from 'ish-core/models/product/product.model';
 import { ProductRowComponentConfiguration } from 'ish-shared/components/product/product-row/product-row.component';
 import { ProductTileComponentConfiguration } from 'ish-shared/components/product/product-tile/product-tile.component';
 
@@ -58,9 +59,9 @@ export const DEFAULT_CONFIGURATION: Readonly<ProductItemContainerConfiguration> 
   selector: 'ish-product-item',
   templateUrl: './product-item.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ProductContextFacade],
 })
 export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
-  private static REQUIRED_COMPLETENESS_LEVEL = ProductCompletenessLevel.List;
   /**
    * The Product SKU to render a product item for.
    */
@@ -88,7 +89,7 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
   private sku$ = new ReplaySubject<string>(1);
   private destroy$ = new Subject();
 
-  constructor(private shoppingFacade: ShoppingFacade) {}
+  constructor(private shoppingFacade: ShoppingFacade, private context: ProductContextFacade) {}
 
   ngOnDestroy() {
     this.destroy$.next();
@@ -96,11 +97,10 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit() {
+    this.product$ = this.context.select('product');
+    this.loading$ = this.context.select('loading');
+
     this.productSkuChange.pipe(startWith(this.productSku), takeUntil(this.destroy$)).subscribe(this.sku$);
-
-    this.product$ = this.shoppingFacade.product$(this.sku$, ProductItemComponent.REQUIRED_COMPLETENESS_LEVEL);
-
-    this.loading$ = this.shoppingFacade.productNotReady$(this.sku$, ProductItemComponent.REQUIRED_COMPLETENESS_LEVEL);
 
     this.productVariationOptions$ = this.shoppingFacade.productVariationOptions$(this.sku$);
 
@@ -109,6 +109,8 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     this.mergeConfiguration(changes);
+
+    this.context.set('sku', () => this.productSku);
   }
 
   private mergeConfiguration(changes: SimpleChanges) {
@@ -124,9 +126,7 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   addToBasket(quantity: number) {
-    this.sku$
-      .pipe(take(1), takeUntil(this.destroy$))
-      .subscribe(sku => this.shoppingFacade.addProductToBasket(sku, quantity));
+    this.context.addToBasket(quantity);
   }
 
   replaceVariation(event: { selection: VariationSelection; changedAttribute?: string }) {

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable, ReplaySubject, Subject, of } from 'rxjs';
 import { filter, map, switchMap, take, takeUntil, withLatestFrom } from 'rxjs/operators';
 
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
 import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { FeatureToggleService } from 'ish-core/feature-toggle.module';
 import { CategoryView } from 'ish-core/models/category-view/category-view.model';
@@ -27,6 +28,7 @@ import { whenTruthy } from 'ish-core/utils/operators';
   selector: 'ish-product-page',
   templateUrl: './product-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ProductContextFacade],
 })
 export class ProductPageComponent implements OnInit, OnDestroy {
   product$: Observable<ProductView | VariationProductView | VariationProductMasterView>;
@@ -49,14 +51,19 @@ export class ProductPageComponent implements OnInit, OnDestroy {
     private router: Router,
     private featureToggleService: FeatureToggleService,
     private appRef: ApplicationRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private context: ProductContextFacade
   ) {}
 
   ngOnInit() {
-    this.product$ = this.shoppingFacade.selectedProduct$;
+    this.context.set('requiredCompletenessLevel', () => ProductCompletenessLevel.Detail);
+    this.context.connect('sku', this.shoppingFacade.selectedProductId$);
+
+    this.product$ = this.context.select('product');
+    this.productLoading$ = this.context.select('loading');
+
     this.productVariationOptions$ = this.shoppingFacade.selectedProductVariationOptions$;
     this.category$ = this.shoppingFacade.selectedCategory$;
-    this.productLoading$ = this.shoppingFacade.productDetailLoading$;
 
     this.product$.pipe(whenTruthy(), takeUntil(this.destroy$)).subscribe(product => {
       this.quantity = product.minOrderQuantity;
