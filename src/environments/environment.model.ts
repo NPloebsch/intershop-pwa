@@ -83,7 +83,8 @@ export interface Environment {
   theme?: string;
 
   // cookie consent options
-  cookieConsentOptions: CookieConsentOptions;
+  cookieConsentOptions?: CookieConsentOptions;
+  cookieConsentVersion?: number;
 }
 
 export const ENVIRONMENT_DEFAULTS: Environment = {
@@ -135,6 +136,6 @@ export const ENVIRONMENT_DEFAULTS: Environment = {
       },
     ],
     allowedCookies: ['apiToken', 'cookieConsent'],
-    updatedAt: '2020-09-21T00:00:00',
   },
+  cookieConsentVersion: 1,
 };

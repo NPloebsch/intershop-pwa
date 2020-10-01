@@ -8,9 +8,11 @@ import { ServerCookiesModule } from 'ngx-utils-cookies-port';
 import { join } from 'path';
 import { Observable, Observer } from 'rxjs';
 
-import { DISPLAY_VERSION } from 'ish-core/configurations/state-keys';
+import { COOKIE_CONSENT_VERSION, DISPLAY_VERSION } from 'ish-core/configurations/state-keys';
 import { UniversalLogInterceptor } from 'ish-core/interceptors/universal-log.interceptor';
 import { UniversalMockInterceptor } from 'ish-core/interceptors/universal-mock.interceptor';
+
+import { environment } from '../environments/environment';
 
 import { AppComponent } from './app.component';
 import { AppModule } from './app.module';
@@ -73,5 +75,6 @@ export class UniversalErrorHandler implements ErrorHandler {
 export class AppServerModule {
   constructor(transferState: TransferState) {
     transferState.set(DISPLAY_VERSION, process.env.DISPLAY_VERSION);
+    transferState.set(COOKIE_CONSENT_VERSION, process.env.COOKIE_CONSENT_VERSION || environment.cookieConsentVersion);
   }
 }

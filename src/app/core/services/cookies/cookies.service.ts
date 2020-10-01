@@ -1,8 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { TransferState } from '@angular/platform-browser';
 import { CookiesOptions, CookiesService as ForeignCookiesService } from 'ngx-utils-cookies-port';
 
 import { COOKIE_CONSENT_OPTIONS } from 'ish-core/configurations/injection-keys';
+import { COOKIE_CONSENT_VERSION } from 'ish-core/configurations/state-keys';
 import {
   CookieConsentCategory,
   CookieConsentOptions,
@@ -14,6 +16,7 @@ export class CookiesService {
   constructor(
     @Inject(PLATFORM_ID) private platformId: string,
     @Inject(COOKIE_CONSENT_OPTIONS) private cookieConsentOptions: CookieConsentOptions,
+    private transferState: TransferState,
     private cookiesService: ForeignCookiesService
   ) {}
 
@@ -30,8 +33,9 @@ export class CookiesService {
   }
 
   setCookiesPreferences(categories: CookieConsentCategory[]) {
+    const cookieConsentVersion = this.transferState.get<number>(COOKIE_CONSENT_VERSION, 1);
     this.deleteAllCookies();
-    this.put('cookieConsent', JSON.stringify({ updatedAt: new Date().toISOString(), enabledCookies: categories }));
+    this.put('cookieConsent', JSON.stringify({ enabledCookies: categories, version: cookieConsentVersion }));
     window.location.reload();
   }
 

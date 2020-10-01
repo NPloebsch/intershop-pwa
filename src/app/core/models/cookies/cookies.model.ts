@@ -8,10 +8,9 @@ export interface CookieConsentOptions {
     required?: boolean;
   }[];
   allowedCookies?: string[];
-  updatedAt: Date | string;
 }
 
 export interface CookieConsentSettings {
-  updatedAt: Date | string;
   enabledCookies: CookieConsentCategory[];
+  version: number;
 }
