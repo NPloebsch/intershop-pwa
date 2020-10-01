@@ -6,8 +6,6 @@
     [quantity]="quantity"
     [category]="category"
     [variationOptions]="productVariationOptions$ | async"
-    [isInCompareList]="isInCompareList$ | async"
-    (compareToggle)="toggleCompare()"
     (productToBasket)="addToBasket($event)"
     (selectVariation)="replaceVariation($event)"
   ></ish-product-tile>
@@ -20,9 +18,6 @@
     (quantityChange)="quantityChange.emit($event)"
     [category]="category"
     [variationOptions]="productVariationOptions$ | async"
-    [isInCompareList]="isInCompareList$ | async"
-    (productToBasket)="addToBasket($event)"
-    (compareToggle)="toggleCompare()"
     (selectVariation)="replaceVariation($event)"
   ></ish-product-row>
 </ng-container>

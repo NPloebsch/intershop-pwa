@@ -3,8 +3,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TranslateModule } from '@ngx-translate/core';
 import { MockComponent } from 'ng-mocks';
-import { spy, verify } from 'ts-mockito';
+import { of } from 'rxjs';
+import { instance, mock, verify, when } from 'ts-mockito';
 
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
 import { FeatureToggleModule } from 'ish-core/feature-toggle.module';
 
 import { ProductAddToCompareComponent } from './product-add-to-compare.component';
@@ -13,11 +15,14 @@ describe('Product Add To Compare Component', () => {
   let component: ProductAddToCompareComponent;
   let fixture: ComponentFixture<ProductAddToCompareComponent>;
   let element: HTMLElement;
+  let context: ProductContextFacade;
 
   beforeEach(async () => {
+    context = mock(ProductContextFacade);
     await TestBed.configureTestingModule({
       imports: [FeatureToggleModule.forTesting('compare'), RouterTestingModule, TranslateModule.forRoot()],
       declarations: [MockComponent(FaIconComponent), ProductAddToCompareComponent],
+      providers: [{ provide: ProductContextFacade, useFactory: () => instance(context) }],
     }).compileComponents();
   });
 
@@ -34,13 +39,13 @@ describe('Product Add To Compare Component', () => {
   });
 
   it('should show muted button when "isInCompareList" is set to "true" ', () => {
-    component.isInCompareList = true;
+    when(context.select('isInCompareList')).thenReturn(of(true));
     fixture.detectChanges();
     expect(element.querySelector('button').className).toContain('is-selected');
   });
 
   it('should show normal button when "isInCompareList" is set to "false" ', () => {
-    component.isInCompareList = false;
+    when(context.select('isInCompareList')).thenReturn(of(false));
     fixture.detectChanges();
     expect(element.querySelector('button').className).toBe('btn add-to-compare');
   });
@@ -57,9 +62,8 @@ describe('Product Add To Compare Component', () => {
   });
 
   it('should detect errors on emitter using spy', () => {
-    const emitter = spy(component.compareToggle);
     component.toggleCompare();
 
-    verify(emitter.emit()).once();
+    verify(context.toggleCompare()).once();
   });
 });

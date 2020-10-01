@@ -13,14 +13,7 @@ import {
   getSelectedCategory,
   loadTopLevelCategories,
 } from 'ish-core/store/shopping/categories';
-import {
-  addToCompare,
-  getCompareProductsCount,
-  getCompareProductsSKUs,
-  isInCompareProducts,
-  removeFromCompare,
-  toggleCompare,
-} from 'ish-core/store/shopping/compare';
+import { getCompareProductsCount, getCompareProductsSKUs, removeFromCompare } from 'ish-core/store/shopping/compare';
 import { getAvailableFilter } from 'ish-core/store/shopping/filter';
 import {
   getProductListingLoading,
@@ -171,18 +164,6 @@ export class ShoppingFacade {
 
   compareProducts$ = this.store.pipe(select(getCompareProductsSKUs));
   compareProductsCount$ = this.store.pipe(select(getCompareProductsCount));
-
-  inCompareProducts$(sku: string | Observable<string>) {
-    return toObservable(sku).pipe(switchMap(plainSKU => this.store.pipe(select(isInCompareProducts(plainSKU)))));
-  }
-
-  addProductToCompare(sku: string) {
-    this.store.dispatch(addToCompare({ sku }));
-  }
-
-  toggleProductCompare(sku: string) {
-    this.store.dispatch(toggleCompare({ sku }));
-  }
 
   removeProductFromCompare(sku: string) {
     this.store.dispatch(removeFromCompare({ sku }));

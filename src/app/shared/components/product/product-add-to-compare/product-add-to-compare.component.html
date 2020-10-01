@@ -2,7 +2,7 @@
   *ishFeature="'compare'"
   class="btn add-to-compare"
   [ngClass]="class"
-  [class.is-selected]="isInCompareList"
+  [class.is-selected]="isInCompareList$ | async"
   title="{{ 'product.compare.link' | translate }}"
   (click)="toggleCompare()"
 >

@@ -41,10 +41,8 @@
             ></ish-lazy-product-add-to-quote>
             <ish-product-add-to-compare
               *ngIf="configuration.displayAddToCompare"
-              [isInCompareList]="isInCompareList"
               displayType="icon"
               class="btn-link"
-              (compareToggle)="toggleCompare()"
             ></ish-product-add-to-compare>
             <ish-lazy-product-add-to-wishlist
               *ngIf="configuration.displayAddToWishlist"

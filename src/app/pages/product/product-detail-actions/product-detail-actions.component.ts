@@ -1,27 +1,31 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import { Product, ProductHelper } from 'ish-core/models/product/product.model';
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
+import { AnyProductViewType, ProductHelper } from 'ish-core/models/product/product.model';
 
 @Component({
   selector: 'ish-product-detail-actions',
   templateUrl: './product-detail-actions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductDetailActionsComponent {
-  @Input() product: Product;
-  @Output() productToCompare = new EventEmitter<void>();
-
+export class ProductDetailActionsComponent implements OnInit {
   /**
-   * TODO: to be removed once channelName inforamtion available in system
+   * TODO: to be removed once channelName information available in system
    */
   channelName = 'inTRONICS';
 
   isMasterProduct = ProductHelper.isMasterProduct;
+  product$: Observable<AnyProductViewType>;
 
-  addToCompare() {
-    this.productToCompare.emit();
+  constructor(@Inject(DOCUMENT) public document: Document, private context: ProductContextFacade) {}
+
+  ngOnInit() {
+    this.product$ = this.context.select('product');
   }
 
-  constructor(@Inject(DOCUMENT) public document: Document) {}
+  addToCompare() {
+    this.context.addToCompare();
+  }
 }

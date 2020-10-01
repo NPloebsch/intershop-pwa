@@ -6,6 +6,7 @@ import { filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { AnyProductViewType, ProductCompletenessLevel, ProductHelper } from 'ish-core/models/product/product.model';
 import { addProductToBasket } from 'ish-core/store/customer/basket';
+import { addToCompare, isInCompareProducts, toggleCompare } from 'ish-core/store/shopping/compare';
 import { getProduct, loadProductIfNotLoaded } from 'ish-core/store/shopping/products';
 import { whenTruthy } from 'ish-core/utils/operators';
 
@@ -15,6 +16,7 @@ export class ProductContextFacade extends RxState<{
   requiredCompletenessLevel: ProductCompletenessLevel;
   product: AnyProductViewType;
   loading: boolean;
+  isInCompareList: boolean;
 }> {
   constructor(private store: Store) {
     super();
@@ -39,11 +41,24 @@ export class ProductContextFacade extends RxState<{
       )
     );
 
+    this.connect(
+      'isInCompareList',
+      this.select('sku').pipe(switchMap(sku => this.store.pipe(select(isInCompareProducts(sku)))))
+    );
+
     // tslint:disable-next-line: no-console
     this.hold(this.$, ctx => console.log(ctx));
   }
 
   addToBasket(quantity: number) {
     this.store.dispatch(addProductToBasket({ sku: this.get('sku'), quantity }));
+  }
+
+  toggleCompare() {
+    this.store.dispatch(toggleCompare({ sku: this.get('sku') }));
+  }
+
+  addToCompare() {
+    this.store.dispatch(addToCompare({ sku: this.get('sku') }));
   }
 }

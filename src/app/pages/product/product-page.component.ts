@@ -119,10 +119,6 @@ export class ProductPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  addToCompare(sku: string) {
-    this.shoppingFacade.addProductToCompare(sku);
-  }
-
   variationSelected(
     event: { selection: VariationSelection; changedAttribute?: string },
     product: VariationProductView

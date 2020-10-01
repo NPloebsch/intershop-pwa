@@ -84,7 +84,6 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
   product$: Observable<ProductView>;
   loading$: Observable<boolean>;
   productVariationOptions$: Observable<VariationOptionGroup[]>;
-  isInCompareList$: Observable<boolean>;
 
   private sku$ = new ReplaySubject<string>(1);
   private destroy$ = new Subject();
@@ -103,8 +102,6 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
     this.productSkuChange.pipe(startWith(this.productSku), takeUntil(this.destroy$)).subscribe(this.sku$);
 
     this.productVariationOptions$ = this.shoppingFacade.productVariationOptions$(this.sku$);
-
-    this.isInCompareList$ = this.shoppingFacade.inCompareProducts$(this.sku$);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -119,10 +116,6 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
       // tslint:disable-next-line:no-assignement-to-inputs
       this.configuration = { ...DEFAULT_CONFIGURATION, ...oldConfig };
     }
-  }
-
-  toggleCompare() {
-    this.sku$.pipe(take(1), takeUntil(this.destroy$)).subscribe(sku => this.shoppingFacade.toggleProductCompare(sku));
   }
 
   addToBasket(quantity: number) {

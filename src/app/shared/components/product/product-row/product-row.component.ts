@@ -45,8 +45,6 @@ export class ProductRowComponent implements OnInit, OnDestroy {
   @Output() quantityChange = new EventEmitter<number>();
   @Input() variationOptions: VariationOptionGroup[];
   @Input() category?: CategoryView;
-  @Input() isInCompareList: boolean;
-  @Output() compareToggle = new EventEmitter<void>();
   @Output() productToBasket = new EventEmitter<number>();
   @Output() selectVariation = new EventEmitter<{ selection: VariationSelection; changedAttribute?: string }>();
 
@@ -77,10 +75,6 @@ export class ProductRowComponent implements OnInit, OnDestroy {
 
   addToBasket() {
     this.productToBasket.emit(this.productItemForm.get(this.quantityControlName).value);
-  }
-
-  toggleCompare() {
-    this.compareToggle.emit();
   }
 
   variationSelected(event: { selection: VariationSelection; changedAttribute?: string }) {

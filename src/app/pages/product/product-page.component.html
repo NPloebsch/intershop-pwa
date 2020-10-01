@@ -11,7 +11,6 @@
         [(quantity)]="quantity"
         [variationOptions]="productVariationOptions$ | async"
         (productToBasket)="addToBasket()"
-        (productToCompare)="addToCompare($event)"
         (selectVariation)="variationSelected($event, product)"
       ></ish-product-detail>
 
