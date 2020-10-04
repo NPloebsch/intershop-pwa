@@ -36,10 +36,14 @@ export class CookiesService {
   }
 
   cookieConsentFor(category: CookieConsentCategory) {
-    const cookieConsentSettings = JSON.parse(
-      this.cookiesService.get('cookieConsent') || 'null'
-    ) as CookieConsentSettings;
-    return cookieConsentSettings?.enabledCookies.includes(category);
+    if (isPlatformBrowser(this.platformId)) {
+      const cookieConsentSettings = JSON.parse(
+        this.cookiesService.get('cookieConsent') || 'null'
+      ) as CookieConsentSettings;
+      return cookieConsentSettings?.enabledCookies.includes(category);
+    } else {
+      return false;
+    }
   }
 
   private deleteAllCookies() {
