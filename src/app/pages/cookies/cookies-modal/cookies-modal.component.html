@@ -22,16 +22,17 @@
         {{ option.messageKeyContent | translate }}
       </p>
     </ng-container>
+  </div>
 
-    <p>
-      <button type="button" class="btn btn-secondary float-right" (click)="hide()">
-        {{ 'cookie_consent.dialog.cancel' | translate }}
-      </button>
-      <button type="button" class="btn btn-primary float-right" (click)="submit()">
-        {{ 'cookie_consent.dialog.save' | translate }}
-      </button>
-
-      <br clear="left" />
-    </p>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="acceptAll()">
+      {{ 'cookie_consent.dialog.accept_all' | translate }}
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="submit()">
+      {{ 'cookie_consent.dialog.save' | translate }}
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="hide()">
+      {{ 'cookie_consent.dialog.cancel' | translate }}
+    </button>
   </div>
 </div>

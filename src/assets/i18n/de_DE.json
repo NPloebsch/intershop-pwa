@@ -778,6 +778,7 @@
   "cookie_consent.banner.set_preferences": "Einstellungen anpassen",
   "cookie_consent.banner.text": "<h4>Ihre Privatsphäre ist uns wichtig</h4><p>Diese Website verwendet Cookies und andere Technologien, um unsere Website sicher zu halten, ihre Leistung zu messen, den Inhalt zu personalisieren und Ihre Nutzung unserer Website zu verbessern. Zu diesem Zweck erfassen wir Daten über Benutzer und deren Verhalten.<br/>Mit der Entscheidung für \"Alle akzeptieren\" stimmen Sie der Verwendung aller Cookies zu. Für weitere Informationen und Anpassung Ihrer Einstellungen wählen Sie \"Einstellungen anpassen\". Detailliertere Informationen finden Sie in unserer <a href=\"page://page.privacyPolicy.pagelet2-Page\">Datenschutzerklärung</a>.</p>",
   "cookie_consent.cookie_preferences": "Cookie-Einstellungen",
+  "cookie_consent.dialog.accept_all": "Alle akzeptieren",
   "cookie_consent.dialog.cancel": "Abbrechen",
   "cookie_consent.dialog.save": "Einstellungen speichern",
   "cookie_consent.dialog.sections.essential.content": "Diese Cookies sind notwendig, um Ihnen die über unsere Website verfügbaren Dienstleistungen zur Verfügung zu stellen und um Ihnen die Nutzung bestimmter Funktionen unseres Shops zu ermöglichen.",

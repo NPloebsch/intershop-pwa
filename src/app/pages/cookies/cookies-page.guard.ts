@@ -14,7 +14,7 @@ export class CookiesPageGuard implements CanActivate {
   async canActivate() {
     this.currentDialog = this.modalService.open(CookiesModalComponent, {
       centered: true,
-      size: 'md',
+      size: 'lg',
       backdrop: 'static',
     });
 

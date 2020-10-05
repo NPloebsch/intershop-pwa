@@ -780,6 +780,7 @@
   "cookie_consent.banner.set_preferences": "Définir les préférences",
   "cookie_consent.banner.text": "<h4>La protection de vos données est fondamentale pour nous</h4><p>Ce site web utilise des cookies et d’autres technologies pour assurer la sécurité de notre site, pour mesurer les performances, pour personnaliser le contenu et pour améliorer votre expérience sur notre site. Nous suivons donc les données sur les utilisateurs et leur comportement.<br/>En confirmant \"Autoriser tous\", vous acceptez l’utilisation de tous les cookies. Cliquez sur \"Définir les préférences\" pour plus de détails et pour gérer vos options. Vous trouverez des informations plus détaillées dans notre <a href=\"page://page.privacyPolicy.pagelet2-Page\">Politique de confidentialité</a>.</p>",
   "cookie_consent.cookie_preferences": "Préférences pour les cookies",
+  "cookie_consent.dialog.accept_all": "Autoriser tous",
   "cookie_consent.dialog.cancel": "Annuler",
   "cookie_consent.dialog.save": "Enregistrer les paramètres",
   "cookie_consent.dialog.sections.essential.content": "Ces cookies sont nécessaires pour vous fournir les services disponibles sur notre site web et pour vous permettre d’utiliser certaines fonctionnalités de notre magasin.",

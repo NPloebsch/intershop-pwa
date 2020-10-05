@@ -33,6 +33,10 @@ export class CookiesModalComponent implements OnInit {
     );
   }
 
+  acceptAll() {
+    this.cookiesService.setCookiesConsentForAll();
+  }
+
   submit() {
     this.cookiesService.setCookiesConsentFor(
       Object.keys(this.selectedIds).reduce((acc, x) => (this.selectedIds[x] ? acc.push(x) && acc : acc), [])
