@@ -1,8 +1,6 @@
-export type CookieConsentCategory = 'required' | 'functional' | 'tracking';
-
 export interface CookieConsentOptions {
   options: {
-    id: CookieConsentCategory;
+    id: string;
     messageKeyTitle: string;
     messageKeyContent: string;
     required?: boolean;
@@ -11,6 +9,6 @@ export interface CookieConsentOptions {
 }
 
 export interface CookieConsentSettings {
-  enabledCookies: CookieConsentCategory[];
+  enabledCookies: string[];
   version: number;
 }

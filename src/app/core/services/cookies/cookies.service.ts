@@ -5,11 +5,7 @@ import { CookiesOptions, CookiesService as ForeignCookiesService } from 'ngx-uti
 
 import { COOKIE_CONSENT_OPTIONS } from 'ish-core/configurations/injection-keys';
 import { COOKIE_CONSENT_VERSION } from 'ish-core/configurations/state-keys';
-import {
-  CookieConsentCategory,
-  CookieConsentOptions,
-  CookieConsentSettings,
-} from 'ish-core/models/cookies/cookies.model';
+import { CookieConsentOptions, CookieConsentSettings } from 'ish-core/models/cookies/cookies.model';
 
 @Injectable({ providedIn: 'root' })
 export class CookiesService {
@@ -32,7 +28,7 @@ export class CookiesService {
     this.cookiesService.put(key, value, options);
   }
 
-  setCookiesConsentFor(categories: CookieConsentCategory[]) {
+  setCookiesConsentFor(categories: string[]) {
     const cookieConsentVersion = this.transferState.get<number>(COOKIE_CONSENT_VERSION, 1);
     this.deleteAllCookies();
     this.put('cookieConsent', JSON.stringify({ enabledCookies: categories, version: cookieConsentVersion }));
@@ -43,7 +39,7 @@ export class CookiesService {
     this.setCookiesConsentFor(this.cookieConsentOptions?.options.map(x => x.id));
   }
 
-  cookieConsentFor(category: CookieConsentCategory) {
+  cookieConsentFor(category: string) {
     if (isPlatformBrowser(this.platformId)) {
       const cookieConsentSettings = JSON.parse(
         this.cookiesService.get('cookieConsent') || 'null'
