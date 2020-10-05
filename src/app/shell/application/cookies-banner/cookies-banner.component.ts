@@ -2,9 +2,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { TransferState } from '@angular/platform-browser';
 
-import { COOKIE_CONSENT_OPTIONS } from 'ish-core/configurations/injection-keys';
 import { COOKIE_CONSENT_VERSION } from 'ish-core/configurations/state-keys';
-import { CookieConsentOptions, CookieConsentSettings } from 'ish-core/models/cookies/cookies.model';
+import { CookieConsentSettings } from 'ish-core/models/cookies/cookies.model';
 import { CookiesService } from 'ish-core/services/cookies/cookies.service';
 
 /**
@@ -21,7 +20,6 @@ export class CookiesBannerComponent implements OnInit {
   // tslint:disable:no-intelligence-in-artifacts
   constructor(
     @Inject(PLATFORM_ID) private platformId: string,
-    @Inject(COOKIE_CONSENT_OPTIONS) private cookieConsentOptions: CookieConsentOptions,
     private transferState: TransferState,
     private cookiesService: CookiesService
   ) {}
@@ -47,7 +45,6 @@ export class CookiesBannerComponent implements OnInit {
   }
 
   acceptAll() {
-    console.log('cookieConsentOptions', this.cookieConsentOptions);
-    this.cookiesService.setCookiesPreferences(['required', 'functional', 'tracking']);
+    this.cookiesService.setCookiesConsentForAll();
   }
 }

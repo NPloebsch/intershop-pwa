@@ -32,11 +32,15 @@ export class CookiesService {
     this.cookiesService.put(key, value, options);
   }
 
-  setCookiesPreferences(categories: CookieConsentCategory[]) {
+  setCookiesConsentFor(categories: CookieConsentCategory[]) {
     const cookieConsentVersion = this.transferState.get<number>(COOKIE_CONSENT_VERSION, 1);
     this.deleteAllCookies();
     this.put('cookieConsent', JSON.stringify({ enabledCookies: categories, version: cookieConsentVersion }));
     window.location.reload();
+  }
+
+  setCookiesConsentForAll() {
+    this.setCookiesConsentFor(this.cookieConsentOptions?.options.map(x => x.id));
   }
 
   cookieConsentFor(category: CookieConsentCategory) {
@@ -44,7 +48,7 @@ export class CookiesService {
       const cookieConsentSettings = JSON.parse(
         this.cookiesService.get('cookieConsent') || 'null'
       ) as CookieConsentSettings;
-      return cookieConsentSettings?.enabledCookies.includes(category);
+      return cookieConsentSettings?.enabledCookies ? cookieConsentSettings.enabledCookies.includes(category) : false;
     } else {
       return false;
     }
@@ -53,7 +57,7 @@ export class CookiesService {
   private deleteAllCookies() {
     const allCookies = this.cookiesService.getAll();
     for (const cookie in allCookies) {
-      if (!this.cookieConsentOptions.allowedCookies.includes(cookie)) {
+      if (!this.cookieConsentOptions?.allowedCookies.includes(cookie)) {
         this.cookiesService.remove(cookie);
       }
     }
