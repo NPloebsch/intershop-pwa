@@ -1,4 +1,4 @@
-<ng-container *ngIf="editable && lineItem && isVariationProduct(product)">
+<ng-container *ngIf="product$ | async as product">
   <a
     (click)="modalDialog.show()"
     class="line-item-edit-link"

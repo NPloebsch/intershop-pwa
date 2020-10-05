@@ -92,17 +92,6 @@ export class ShoppingFacade {
     return this.store.pipe(select(getProductBundleParts, { sku }));
   }
 
-  productNotReady$(sku$: Observable<string>, level: ProductCompletenessLevel) {
-    return sku$.pipe(
-      switchMap(sku =>
-        this.store.pipe(
-          select(getProduct, { sku }),
-          map(p => !ProductHelper.isReadyForDisplay(p, level))
-        )
-      )
-    );
-  }
-
   // CHECKOUT
 
   addProductToBasket(sku: string, quantity: number) {

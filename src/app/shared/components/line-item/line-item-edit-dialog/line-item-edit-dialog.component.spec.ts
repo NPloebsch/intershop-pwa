@@ -4,8 +4,9 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { MockComponent, MockPipe } from 'ng-mocks';
 import { of } from 'rxjs';
-import { anything, instance, mock, when } from 'ts-mockito';
+import { instance, mock, when } from 'ts-mockito';
 
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
 import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { LineItemView } from 'ish-core/models/line-item/line-item.model';
 import { PricePipe } from 'ish-core/models/price/price.pipe';
@@ -28,9 +29,11 @@ describe('Line Item Edit Dialog Component', () => {
   let fixture: ComponentFixture<LineItemEditDialogComponent>;
   let element: HTMLElement;
   let shoppingFacade: ShoppingFacade;
+  let context: ProductContextFacade;
 
   beforeEach(async () => {
     shoppingFacade = mock(ShoppingFacade);
+    context = mock(ProductContextFacade);
 
     await TestBed.configureTestingModule({
       imports: [NgbModalModule, ReactiveFormsModule, TranslateModule.forRoot()],
@@ -46,7 +49,10 @@ describe('Line Item Edit Dialog Component', () => {
         MockComponent(ProductVariationSelectComponent),
         MockPipe(PricePipe),
       ],
-      providers: [{ provide: ShoppingFacade, useFactory: () => instance(shoppingFacade) }],
+      providers: [
+        { provide: ShoppingFacade, useFactory: () => instance(shoppingFacade) },
+        { provide: ProductContextFacade, useFactory: () => instance(context) },
+      ],
     }).compileComponents();
   });
 
@@ -61,7 +67,7 @@ describe('Line Item Edit Dialog Component', () => {
       },
     } as unknown) as LineItemView;
 
-    when(shoppingFacade.product$(anything(), anything())).thenReturn(
+    when(context.select('productAsVariationProduct')).thenReturn(
       of({
         type: 'VariationProduct',
         sku: 'SKU',
@@ -72,7 +78,7 @@ describe('Line Item Edit Dialog Component', () => {
       } as VariationProductView)
     );
 
-    when(shoppingFacade.productNotReady$(anything(), anything())).thenReturn(of(false));
+    when(context.select('loading')).thenReturn(of(false));
   });
 
   it('should be created', () => {
@@ -92,7 +98,7 @@ describe('Line Item Edit Dialog Component', () => {
   });
 
   it('should display loading-components on the container', () => {
-    when(shoppingFacade.productNotReady$(anything(), anything())).thenReturn(of(true));
+    when(context.select('loading')).thenReturn(of(true));
     fixture.detectChanges();
     expect(findAllCustomElements(element)).toIncludeAllMembers(['ish-input', 'ish-loading']);
   });

@@ -10,22 +10,17 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
-import { filter, take, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
 import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { LineItemUpdate } from 'ish-core/models/line-item-update/line-item-update.model';
 import { LineItemView } from 'ish-core/models/line-item/line-item.model';
 import { ProductVariationHelper } from 'ish-core/models/product-variation/product-variation.helper';
 import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
 import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
-import {
-  ProductView,
-  VariationProductMasterView,
-  VariationProductView,
-} from 'ish-core/models/product-view/product-view.model';
-import { VariationProduct } from 'ish-core/models/product/product-variation.model';
-import { ProductCompletenessLevel, ProductHelper } from 'ish-core/models/product/product.model';
+import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
 import { ModalDialogComponent } from 'ish-shared/components/common/modal-dialog/modal-dialog.component';
 import { SpecialValidators } from 'ish-shared/forms/validators/special-validators';
 
@@ -37,7 +32,6 @@ import { SpecialValidators } from 'ish-shared/forms/validators/special-validator
  * @example
  * <ish-line-item-edit-dialog
  *   [lineItem]="lineItem"
- *   [editable]="editable"
  *   [modalDialogRef]="modalDialogRef"
  *   (updateItem)="onUpdateItem($event)"
  * ></ish-line-item-edit-dialog>
@@ -50,47 +44,37 @@ import { SpecialValidators } from 'ish-shared/forms/validators/special-validator
 export class LineItemEditDialogComponent implements OnInit, OnDestroy, OnChanges {
   @Input() lineItem: LineItemView;
   @Input() modalDialogRef?: ModalDialogComponent<unknown>;
-  @Input() editable = true;
   @Output() updateItem = new EventEmitter<LineItemUpdate>();
 
-  private product$: Observable<ProductView | VariationProductView | VariationProductMasterView>;
   variationOptions$: Observable<VariationOptionGroup[]>;
-  variation$: Observable<VariationProduct | VariationProductView>;
+  variation$: Observable<VariationProductView>;
   loading$: Observable<boolean>;
 
-  form: FormGroup;
-
-  /** holds the current SKU */
-  private sku$ = new ReplaySubject<string>(1);
+  form = new FormGroup({
+    quantity: new FormControl(undefined, [
+      Validators.required,
+      // Validators.max(this.lineItem.product.maxOrderQuantity),
+      SpecialValidators.integer,
+    ]),
+  });
 
   private destroy$ = new Subject();
 
-  constructor(private shoppingFacade: ShoppingFacade) {
-    this.form = new FormGroup({
-      quantity: new FormControl(undefined),
-    });
-  }
+  constructor(private shoppingFacade: ShoppingFacade, private context: ProductContextFacade) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.lineItem && this.lineItem) {
       this.form.patchValue({ quantity: this.lineItem.quantity.value });
-      this.form.get('quantity').setValidators([
-        Validators.required,
-        // Validators.max(this.lineItem.product.maxOrderQuantity),
-        SpecialValidators.integer,
-      ]);
-      this.sku$.next(this.lineItem.productSKU);
+      this.context.set('sku', () => this.lineItem.productSKU);
     }
   }
 
   ngOnInit() {
-    this.product$ = this.shoppingFacade.product$(this.sku$, ProductCompletenessLevel.List);
+    this.variationOptions$ = this.shoppingFacade.productVariationOptions$(this.context.select('sku'));
 
-    this.variationOptions$ = this.shoppingFacade.productVariationOptions$(this.sku$);
+    this.variation$ = this.context.select('productAsVariationProduct');
 
-    this.variation$ = this.product$.pipe(filter(p => ProductHelper.isVariationProduct(p)));
-
-    this.loading$ = this.shoppingFacade.productNotReady$(this.sku$, ProductCompletenessLevel.List);
+    this.loading$ = this.context.select('loading');
 
     this.variation$.pipe(takeUntil(this.destroy$)).subscribe(product => {
       if (this.modalDialogRef) {
@@ -116,7 +100,7 @@ export class LineItemEditDialogComponent implements OnInit, OnDestroy, OnChanges
         product,
         event.changedAttribute
       );
-      this.sku$.next(sku);
+      this.context.set('sku', () => sku);
     });
   }
 
@@ -125,11 +109,11 @@ export class LineItemEditDialogComponent implements OnInit, OnDestroy, OnChanges
    */
   private initModalDialogConfirmed() {
     if (this.modalDialogRef) {
-      this.modalDialogRef.confirmed.pipe(withLatestFrom(this.sku$), takeUntil(this.destroy$)).subscribe(([, sku]) => {
+      this.modalDialogRef.confirmed.pipe(takeUntil(this.destroy$)).subscribe(() => {
         const data: LineItemUpdate = {
           itemId: this.lineItem.id,
           quantity: +this.form.get('quantity').value,
-          sku,
+          sku: this.context.get('sku'),
         };
         this.updateItem.emit(data);
       });

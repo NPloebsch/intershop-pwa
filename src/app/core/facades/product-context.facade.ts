@@ -4,6 +4,7 @@ import { RxState } from '@rx-angular/state';
 import { combineLatest } from 'rxjs';
 import { filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 
+import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
 import { AnyProductViewType, ProductCompletenessLevel, ProductHelper } from 'ish-core/models/product/product.model';
 import { addProductToBasket } from 'ish-core/store/customer/basket';
 import { addToCompare, isInCompareProducts, toggleCompare } from 'ish-core/store/shopping/compare';
@@ -15,6 +16,7 @@ export class ProductContextFacade extends RxState<{
   sku: string;
   requiredCompletenessLevel: ProductCompletenessLevel;
   product: AnyProductViewType;
+  productAsVariationProduct: VariationProductView;
   loading: boolean;
   isInCompareList: boolean;
 }> {
@@ -40,6 +42,8 @@ export class ProductContextFacade extends RxState<{
         )
       )
     );
+
+    this.connect('productAsVariationProduct', this.select('product').pipe(filter(ProductHelper.isVariationProduct)));
 
     this.connect(
       'isInCompareList',

@@ -50,13 +50,13 @@
         <!-- default lineItemViewType -->
         <ng-container *ngSwitchDefault>
           <!-- edit variation & quantity -->
-          <ish-line-item-edit
-            *ishNotFeature="'advancedVariationHandling'"
-            [lineItem]="pli"
-            [product]="product"
-            [editable]="editable"
-            (updateItem)="onUpdateItem($event)"
-          ></ish-line-item-edit>
+          <ng-container *ngIf="editable">
+            <ish-line-item-edit
+              *ishNotFeature="'advancedVariationHandling'"
+              [lineItem]="pli"
+              (updateItem)="onUpdateItem($event)"
+            ></ish-line-item-edit>
+          </ng-container>
 
           <!-- availability -->
           <ish-product-inventory [product]="product"></ish-product-inventory>
