@@ -1,7 +1,9 @@
+import { AnimationEvent } from '@angular/animations';
 import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { TransferState } from '@angular/platform-browser';
 
+import bottomOutAnimation from 'ish-core/animations/bottom-out.animation';
 import { COOKIE_CONSENT_VERSION } from 'ish-core/configurations/state-keys';
 import { CookieConsentSettings } from 'ish-core/models/cookies/cookies.model';
 import { CookiesService } from 'ish-core/services/cookies/cookies.service';
@@ -13,9 +15,11 @@ import { CookiesService } from 'ish-core/services/cookies/cookies.service';
   selector: 'ish-cookies-banner',
   templateUrl: './cookies-banner.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [bottomOutAnimation()],
 })
 export class CookiesBannerComponent implements OnInit {
   showBanner = false;
+  transitionBanner = undefined;
 
   // tslint:disable:no-intelligence-in-artifacts
   constructor(
@@ -45,6 +49,12 @@ export class CookiesBannerComponent implements OnInit {
   }
 
   acceptAll() {
-    this.cookiesService.setCookiesConsentForAll();
+    this.transitionBanner = 'bottom-out';
+  }
+
+  acceptAllAnimationDone(event: AnimationEvent): void {
+    if (event.toState === 'bottom-out') {
+      this.cookiesService.setCookiesConsentForAll();
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { PLATFORM_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserTransferStateModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { MockDirective } from 'ng-mocks';
@@ -21,7 +22,7 @@ describe('Cookies Banner Component', () => {
     const cookiesServiceMock = mock(CookiesService);
 
     await TestBed.configureTestingModule({
-      imports: [BrowserTransferStateModule, RouterTestingModule, TranslateModule.forRoot()],
+      imports: [BrowserAnimationsModule, BrowserTransferStateModule, RouterTestingModule, TranslateModule.forRoot()],
       declarations: [CookiesBannerComponent, MockDirective(ServerHtmlDirective)],
       providers: [
         { provide: PLATFORM_ID, useValue: 'browser' },

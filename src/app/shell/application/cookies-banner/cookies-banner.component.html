@@ -1,4 +1,9 @@
-<div *ngIf="showBanner" class="cookies-banner">
+<div
+  *ngIf="showBanner"
+  [@bottomOut]="transitionBanner"
+  (@bottomOut.done)="acceptAllAnimationDone($event)"
+  class="cookies-banner"
+>
   <div [ishServerHtml]="'cookie_consent.banner.text' | translate"></div>
 
   <button type="button" class="btn btn-light float-right" (click)="acceptAll()">
