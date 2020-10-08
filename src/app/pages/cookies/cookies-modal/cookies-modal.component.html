@@ -1,6 +1,6 @@
 <div class="cookie-consent-modal">
   <div class="modal-header">
-    <h2>{{ 'cookie_consent.cookie_preferences' | translate }}</h2>
+    <h2>{{ 'cookie.preferences.heading' | translate }}</h2>
     <button type="button" class="close close-modal" (click)="hide()">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -12,27 +12,27 @@
         <label>
           <input
             type="checkbox"
-            [checked]="option.required || cookieConsentSettings?.enabledCookies.includes(option.id)"
+            [checked]="option.required || cookieConsentSettings?.enabledOptions.includes(option.id)"
             [disabled]="option.required"
             (change)="selectedIds[option.id] = !selectedIds[option.id]"
           />
-          <b>{{ option.messageKeyTitle | translate }}</b>
+          <b>{{ option.name | translate }}</b>
         </label>
         <br />
-        {{ option.messageKeyContent | translate }}
+        {{ option.description | translate }}
       </p>
     </ng-container>
   </div>
 
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" (click)="acceptAll()">
-      {{ 'cookie_consent.dialog.accept_all' | translate }}
+      {{ 'cookies.modal.accept_all' | translate }}
     </button>
     <button type="button" class="btn btn-secondary" (click)="submit()">
-      {{ 'cookie_consent.dialog.save' | translate }}
+      {{ 'cookies.modal.save' | translate }}
     </button>
     <button type="button" class="btn btn-secondary" (click)="hide()">
-      {{ 'cookie_consent.dialog.cancel' | translate }}
+      {{ 'cookies.modal.cancel' | translate }}
     </button>
   </div>
 </div>

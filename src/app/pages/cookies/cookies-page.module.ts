@@ -13,7 +13,7 @@ const cookiesPageRoutes: Routes = [
     canActivate: [CookiesPageGuard],
     data: {
       meta: {
-        title: 'cookie_consent.cookie_preferences',
+        title: 'cookie.preferences.heading',
         robots: 'noindex, nofollow',
       },
     },

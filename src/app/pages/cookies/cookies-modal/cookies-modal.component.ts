@@ -27,7 +27,7 @@ export class CookiesModalComponent implements OnInit {
   ngOnInit() {
     this.cookieConsentSettings = JSON.parse(this.cookiesService.get('cookieConsent') || 'null');
     this.cookieConsentOptions?.options.map(option =>
-      option.required || this.cookieConsentSettings?.enabledCookies.includes(option.id)
+      option.required || this.cookieConsentSettings?.enabledOptions.includes(option.id)
         ? (this.selectedIds[option.id] = true)
         : undefined
     );

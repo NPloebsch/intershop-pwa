@@ -24,14 +24,9 @@ describe('Cookies Service', () => {
             options: [
               {
                 id: 'required',
-                messageKeyTitle: 'required.title',
-                messageKeyContent: 'required.content',
+                name: 'required.name',
+                description: 'required.description',
                 required: true,
-              },
-              {
-                id: 'functional',
-                messageKeyTitle: 'functional.title',
-                messageKeyContent: 'functional.content',
               },
             ],
           },

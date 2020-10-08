@@ -120,22 +120,22 @@ export const ENVIRONMENT_DEFAULTS: Environment = {
     options: [
       {
         id: 'required',
-        messageKeyTitle: 'cookie_consent.dialog.sections.essential.title',
-        messageKeyContent: 'cookie_consent.dialog.sections.essential.content',
+        name: 'cookie.consent.option.required.name',
+        description: 'cookie.consent.option.required.description',
         required: true,
       },
       {
         id: 'functional',
-        messageKeyTitle: 'cookie_consent.dialog.sections.functional.title',
-        messageKeyContent: 'cookie_consent.dialog.sections.functional.content',
+        name: 'cookie.consent.option.functional.name',
+        description: 'cookie.consent.option.functional.description',
       },
       {
         id: 'tracking',
-        messageKeyTitle: 'cookie_consent.dialog.sections.tracking.title',
-        messageKeyContent: 'cookie_consent.dialog.sections.tracking.content',
+        name: 'cookie.consent.option.tracking.name',
+        description: 'cookie.consent.option.tracking.description',
       },
     ],
-    allowedCookies: ['apiToken', 'cookieConsent'],
+    allowedCookies: ['cookieConsent', 'apiToken'],
   },
   cookieConsentVersion: 1,
 };

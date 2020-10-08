@@ -4,13 +4,13 @@
   (@bottomOut.done)="acceptAllAnimationDone($event)"
   class="cookies-banner"
 >
-  <div [ishServerHtml]="'cookie_consent.banner.text' | translate"></div>
+  <div [ishServerHtml]="'cookies.banner.text' | translate"></div>
 
   <button type="button" class="btn btn-light float-right" (click)="acceptAll()">
-    {{ 'cookie_consent.banner.accept_all' | translate }}
+    {{ 'cookies.banner.accept_all' | translate }}
   </button>
 
   <button type="button" class="btn btn-outline-light float-right" routerLink="/cookies">
-    {{ 'cookie_consent.banner.set_preferences' | translate }}
+    {{ 'cookies.banner.set_preferences' | translate }}
   </button>
 </div>

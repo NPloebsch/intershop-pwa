@@ -28,10 +28,10 @@ export class CookiesService {
     this.cookiesService.put(key, value, options);
   }
 
-  setCookiesConsentFor(categories: string[]) {
+  setCookiesConsentFor(options: string[]) {
     const cookieConsentVersion = this.transferState.get<number>(COOKIE_CONSENT_VERSION, 1);
     this.deleteAllCookies();
-    this.put('cookieConsent', JSON.stringify({ enabledCookies: categories, version: cookieConsentVersion }));
+    this.put('cookieConsent', JSON.stringify({ enabledOptions: options, version: cookieConsentVersion }));
     window.location.reload();
   }
 
@@ -39,12 +39,12 @@ export class CookiesService {
     this.setCookiesConsentFor(this.cookieConsentOptions?.options.map(x => x.id));
   }
 
-  cookieConsentFor(category: string) {
+  cookieConsentFor(option: string) {
     if (isPlatformBrowser(this.platformId)) {
       const cookieConsentSettings = JSON.parse(
         this.cookiesService.get('cookieConsent') || 'null'
       ) as CookieConsentSettings;
-      return cookieConsentSettings?.enabledCookies ? cookieConsentSettings.enabledCookies.includes(category) : false;
+      return cookieConsentSettings?.enabledOptions ? cookieConsentSettings.enabledOptions.includes(option) : false;
     } else {
       return false;
     }

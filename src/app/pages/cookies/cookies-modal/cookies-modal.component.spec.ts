@@ -17,7 +17,7 @@ describe('Cookies Modal Component', () => {
   beforeEach(async () => {
     const cookiesServiceMock = mock(CookiesService);
     when(cookiesServiceMock.get('cookieConsent')).thenReturn(
-      JSON.stringify({ enabledCookies: ['required', 'functional'], version: 1 })
+      JSON.stringify({ enabledOptions: ['required', 'functional'], version: 1 })
     );
 
     await TestBed.configureTestingModule({
@@ -30,14 +30,14 @@ describe('Cookies Modal Component', () => {
             options: [
               {
                 id: 'required',
-                messageKeyTitle: 'required.title',
-                messageKeyContent: 'required.content',
+                name: 'required.name',
+                description: 'required.description',
                 required: true,
               },
               {
                 id: 'functional',
-                messageKeyTitle: 'functional.title',
-                messageKeyContent: 'functional.content',
+                name: 'functional.name',
+                description: 'functional.description',
               },
             ],
           },
