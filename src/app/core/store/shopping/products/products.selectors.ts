@@ -6,7 +6,6 @@ import { CategoryTree } from 'ish-core/models/category-tree/category-tree.model'
 import { CategoryView, createCategoryView } from 'ish-core/models/category-view/category-view.model';
 import { Category } from 'ish-core/models/category/category.model';
 import { ProductLinks, ProductLinksView } from 'ish-core/models/product-links/product-links.model';
-import { ProductVariationHelper } from 'ish-core/models/product-variation/product-variation.helper';
 import {
   ProductView,
   VariationProductMasterView,
@@ -24,16 +23,6 @@ import { getShoppingState } from 'ish-core/store/shopping/shopping-store';
 import { productAdapter } from './products.reducer';
 
 const getProductsState = createSelector(getShoppingState, state => state.products);
-
-const productToVariationOptions = memoize(
-  product => {
-    if (ProductHelper.isVariationProduct(product) && ProductHelper.hasVariations(product)) {
-      return ProductVariationHelper.buildVariationOptionGroups(product);
-    }
-  },
-  product =>
-    `${product && product.sku}#${ProductHelper.isVariationProduct(product) && ProductHelper.hasVariations(product)}`
-);
 
 export const { selectEntities: getProductEntities } = productAdapter.getSelectors(getProductsState);
 
@@ -102,10 +91,6 @@ export const getSelectedProduct = createSelector(
   selectRouteParam('sku'),
   (state, sku): ProductView | VariationProductView | VariationProductMasterView => getProduct(state, { sku })
 );
-
-export const getProductVariationOptions = createSelector(getProduct, productToVariationOptions);
-
-export const getSelectedProductVariationOptions = createSelector(getSelectedProduct, productToVariationOptions);
 
 export const getProductBundleParts = createSelector(getProductEntities, (entities, props: { sku: string }): {
   product: Product;

@@ -4,6 +4,7 @@ import { RxState } from '@rx-angular/state';
 import { combineLatest } from 'rxjs';
 import { filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 
+import { ProductVariationHelper } from 'ish-core/models/product-variation/product-variation.helper';
 import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
 import { AnyProductViewType, ProductCompletenessLevel, ProductHelper } from 'ish-core/models/product/product.model';
 import { addProductToBasket } from 'ish-core/store/customer/basket';
@@ -52,6 +53,12 @@ export class ProductContextFacade extends RxState<{
 
     // tslint:disable-next-line: no-console
     this.hold(this.$, ctx => console.log(ctx));
+  }
+
+  changeVariationOption(name: string, value: string) {
+    this.set('sku', () =>
+      ProductVariationHelper.findPossibleVariation(name, value, this.get('productAsVariationProduct'))
+    );
   }
 
   addToBasket(quantity: number) {

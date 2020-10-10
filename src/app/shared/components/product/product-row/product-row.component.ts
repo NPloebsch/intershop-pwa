@@ -4,8 +4,6 @@ import { Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 
 import { CategoryView } from 'ish-core/models/category-view/category-view.model';
-import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
-import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
 import {
   ProductView,
   VariationProductMasterView,
@@ -43,10 +41,8 @@ export class ProductRowComponent implements OnInit, OnDestroy {
   @Input() product: ProductView | VariationProductView | VariationProductMasterView;
   @Input() quantity: number;
   @Output() quantityChange = new EventEmitter<number>();
-  @Input() variationOptions: VariationOptionGroup[];
   @Input() category?: CategoryView;
   @Output() productToBasket = new EventEmitter<number>();
-  @Output() selectVariation = new EventEmitter<{ selection: VariationSelection; changedAttribute?: string }>();
 
   isMasterProduct = ProductHelper.isMasterProduct;
   isVariationProduct = ProductHelper.isVariationProduct;
@@ -76,11 +72,5 @@ export class ProductRowComponent implements OnInit, OnDestroy {
 
   addToBasket() {
     this.productToBasket.emit(this.productItemForm.get(this.quantityControlName).value);
-  }
-
-  variationSelected(event: { selection: VariationSelection; changedAttribute?: string }) {
-    if (ProductHelper.isVariationProduct(this.product)) {
-      this.selectVariation.emit(event);
-    }
   }
 }

@@ -4,22 +4,15 @@ import {
   EventEmitter,
   Input,
   OnChanges,
-  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
 } from '@angular/core';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
-import { filter, startWith, take, takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
-import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { Category } from 'ish-core/models/category/category.model';
-import { ProductVariationHelper } from 'ish-core/models/product-variation/product-variation.helper';
-import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
-import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
-import { ProductView, VariationProductView } from 'ish-core/models/product-view/product-view.model';
-import { ProductHelper } from 'ish-core/models/product/product.model';
+import { ProductView } from 'ish-core/models/product-view/product-view.model';
 import { ProductRowComponentConfiguration } from 'ish-shared/components/product/product-row/product-row.component';
 import { ProductTileComponentConfiguration } from 'ish-shared/components/product/product-tile/product-tile.component';
 
@@ -61,7 +54,7 @@ export const DEFAULT_CONFIGURATION: Readonly<ProductItemContainerConfiguration> 
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ProductContextFacade],
 })
-export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
+export class ProductItemComponent implements OnInit, OnChanges {
   /**
    * The Product SKU to render a product item for.
    */
@@ -83,25 +76,14 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
 
   product$: Observable<ProductView>;
   loading$: Observable<boolean>;
-  productVariationOptions$: Observable<VariationOptionGroup[]>;
 
-  private sku$ = new ReplaySubject<string>(1);
-  private destroy$ = new Subject();
-
-  constructor(private shoppingFacade: ShoppingFacade, private context: ProductContextFacade) {}
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+  constructor(private context: ProductContextFacade) {}
 
   ngOnInit() {
     this.product$ = this.context.select('product');
     this.loading$ = this.context.select('loading');
 
-    this.productSkuChange.pipe(startWith(this.productSku), takeUntil(this.destroy$)).subscribe(this.sku$);
-
-    this.productVariationOptions$ = this.shoppingFacade.productVariationOptions$(this.sku$);
+    this.context.hold(this.context.select('sku'), sku => this.productSkuChange.next(sku));
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -120,23 +102,6 @@ export class ProductItemComponent implements OnInit, OnChanges, OnDestroy {
 
   addToBasket(quantity: number) {
     this.context.addToBasket(quantity);
-  }
-
-  replaceVariation(event: { selection: VariationSelection; changedAttribute?: string }) {
-    this.product$
-      .pipe(
-        take(1),
-        filter<VariationProductView>(product => ProductHelper.isVariationProduct(product)),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(product => {
-        const { sku } = ProductVariationHelper.findPossibleVariationForSelection(
-          event.selection,
-          product,
-          event.changedAttribute
-        );
-        this.productSkuChange.emit(sku);
-      });
   }
 
   get isTile() {

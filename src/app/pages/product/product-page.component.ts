@@ -8,8 +8,6 @@ import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { FeatureToggleService } from 'ish-core/feature-toggle.module';
 import { CategoryView } from 'ish-core/models/category-view/category-view.model';
 import { ProductVariationHelper } from 'ish-core/models/product-variation/product-variation.helper';
-import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
-import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
 import {
   ProductView,
   VariationProductMasterView,
@@ -32,7 +30,6 @@ import { whenTruthy } from 'ish-core/utils/operators';
 })
 export class ProductPageComponent implements OnInit, OnDestroy {
   product$: Observable<ProductView | VariationProductView | VariationProductMasterView>;
-  productVariationOptions$: Observable<VariationOptionGroup[]>;
   productLoading$: Observable<boolean>;
   category$: Observable<CategoryView>;
 
@@ -59,10 +56,11 @@ export class ProductPageComponent implements OnInit, OnDestroy {
     this.context.set('requiredCompletenessLevel', () => ProductCompletenessLevel.Detail);
     this.context.connect('sku', this.shoppingFacade.selectedProductId$);
 
+    this.context.hold(this.context.select('productAsVariationProduct'), product => this.redirectToVariation(product));
+
     this.product$ = this.context.select('product');
     this.productLoading$ = this.context.select('loading');
 
-    this.productVariationOptions$ = this.shoppingFacade.selectedProductVariationOptions$;
     this.category$ = this.shoppingFacade.selectedCategory$;
 
     this.product$.pipe(whenTruthy(), takeUntil(this.destroy$)).subscribe(product => {
@@ -119,26 +117,14 @@ export class ProductPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  variationSelected(
-    event: { selection: VariationSelection; changedAttribute?: string },
-    product: VariationProductView
-  ) {
-    const variation = ProductVariationHelper.findPossibleVariationForSelection(
-      event.selection,
-      product,
-      event.changedAttribute
-    );
-    this.redirectToVariation(variation);
-  }
-
   redirectToVariation(variation: VariationProductView, replaceUrl = false) {
     this.appRef.isStable
       .pipe(
-        filter(() => !!variation),
         whenTruthy(),
         take(1),
         map(() => variation),
-        withLatestFrom(this.category$),
+        whenTruthy(),
+        withLatestFrom(this.shoppingFacade.selectedCategory$),
         takeUntil(this.destroy$)
       )
       .subscribe(([product, category]) => {

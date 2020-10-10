@@ -11,15 +11,11 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
-import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { LineItemUpdate } from 'ish-core/models/line-item-update/line-item-update.model';
 import { LineItemView } from 'ish-core/models/line-item/line-item.model';
-import { ProductVariationHelper } from 'ish-core/models/product-variation/product-variation.helper';
-import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
-import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
 import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
 import { ModalDialogComponent } from 'ish-shared/components/common/modal-dialog/modal-dialog.component';
 import { SpecialValidators } from 'ish-shared/forms/validators/special-validators';
@@ -46,7 +42,6 @@ export class LineItemEditDialogComponent implements OnInit, OnDestroy, OnChanges
   @Input() modalDialogRef?: ModalDialogComponent<unknown>;
   @Output() updateItem = new EventEmitter<LineItemUpdate>();
 
-  variationOptions$: Observable<VariationOptionGroup[]>;
   variation$: Observable<VariationProductView>;
   loading$: Observable<boolean>;
 
@@ -60,7 +55,7 @@ export class LineItemEditDialogComponent implements OnInit, OnDestroy, OnChanges
 
   private destroy$ = new Subject();
 
-  constructor(private shoppingFacade: ShoppingFacade, private context: ProductContextFacade) {}
+  constructor(private context: ProductContextFacade) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.lineItem && this.lineItem) {
@@ -70,8 +65,6 @@ export class LineItemEditDialogComponent implements OnInit, OnDestroy, OnChanges
   }
 
   ngOnInit() {
-    this.variationOptions$ = this.shoppingFacade.productVariationOptions$(this.context.select('sku'));
-
     this.variation$ = this.context.select('productAsVariationProduct');
 
     this.loading$ = this.context.select('loading');
@@ -88,20 +81,6 @@ export class LineItemEditDialogComponent implements OnInit, OnDestroy, OnChanges
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  /**
-   * handle form-change for variations
-   */
-  variationSelected(event: { selection: VariationSelection; changedAttribute?: string }) {
-    this.variation$.pipe(take(1), takeUntil(this.destroy$)).subscribe((product: VariationProductView) => {
-      const { sku } = ProductVariationHelper.findPossibleVariationForSelection(
-        event.selection,
-        product,
-        event.changedAttribute
-      );
-      this.context.set('sku', () => sku);
-    });
   }
 
   /**

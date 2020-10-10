@@ -1,15 +1,20 @@
-<form *ngIf="form" [formGroup]="form">
+<ng-container *ngIf="variationOptions$ | async as variationOptions">
   <div *ngFor="let group of variationOptions" class="product-variation">
     <div class="form-group">
       <label [for]="uuid + '__' + group.id" class="col-form-label">{{ group.label }}</label>
       <select
         class="form-control"
         [id]="uuid + '__' + group.id"
-        [formControlName]="group.id"
         [attr.data-testing-id]="group.id"
+        (change)="optionChange(group.id, $event.target.value)"
       >
         <ng-container *ngFor="let option of group.options">
-          <option *ngIf="!option.alternativeCombination || variationOptions.length > 1" [value]="option.value">
+          <option
+            *ngIf="!option.alternativeCombination || variationOptions.length > 1"
+            [value]="option.value"
+            [selected]="option.active"
+            [attr.data-testing-id]="group.id + '-' + option.value"
+          >
             {{ option.label }}
             <ng-container *ngIf="option.alternativeCombination">
               - {{ 'product.available_in_different_configuration' | translate }}
@@ -19,4 +24,4 @@
       </select>
     </div>
   </div>
-</form>
+</ng-container>

@@ -7,7 +7,6 @@ import { of } from 'rxjs';
 import { instance, mock, when } from 'ts-mockito';
 
 import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
-import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { LineItemView } from 'ish-core/models/line-item/line-item.model';
 import { PricePipe } from 'ish-core/models/price/price.pipe';
 import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
@@ -28,11 +27,9 @@ describe('Line Item Edit Dialog Component', () => {
   let component: LineItemEditDialogComponent;
   let fixture: ComponentFixture<LineItemEditDialogComponent>;
   let element: HTMLElement;
-  let shoppingFacade: ShoppingFacade;
   let context: ProductContextFacade;
 
   beforeEach(async () => {
-    shoppingFacade = mock(ShoppingFacade);
     context = mock(ProductContextFacade);
 
     await TestBed.configureTestingModule({
@@ -49,10 +46,7 @@ describe('Line Item Edit Dialog Component', () => {
         MockComponent(ProductVariationSelectComponent),
         MockPipe(PricePipe),
       ],
-      providers: [
-        { provide: ShoppingFacade, useFactory: () => instance(shoppingFacade) },
-        { provide: ProductContextFacade, useFactory: () => instance(context) },
-      ],
+      providers: [{ provide: ProductContextFacade, useFactory: () => instance(context) }],
     }).compileComponents();
   });
 

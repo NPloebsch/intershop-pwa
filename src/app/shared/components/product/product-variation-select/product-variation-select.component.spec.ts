@@ -1,7 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule } from '@ngx-translate/core';
+import { of } from 'rxjs';
+import { anything, capture, instance, mock, verify, when } from 'ts-mockito';
+
+import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
+import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
+import { findAllDataTestingIDs } from 'ish-core/utils/dev/html-query-utils';
 
 import { ProductVariationSelectComponent } from './product-variation-select.component';
 
@@ -9,11 +16,30 @@ describe('Product Variation Select Component', () => {
   let component: ProductVariationSelectComponent;
   let fixture: ComponentFixture<ProductVariationSelectComponent>;
   let element: HTMLElement;
+  let context: ProductContextFacade;
+
+  const variationProduct = {
+    variableVariationAttributes: [
+      { variationAttributeId: 'a1', value: 'B' },
+      { variationAttributeId: 'a2', value: 'D' },
+    ],
+    variations: () => [variationProduct],
+    productMaster: () => ({
+      variationAttributeValues: [
+        { variationAttributeId: 'a1', value: 'A' },
+        { variationAttributeId: 'a1', value: 'B' },
+        { variationAttributeId: 'a2', value: 'C' },
+        { variationAttributeId: 'a2', value: 'D' },
+      ],
+    }),
+  } as VariationProductView;
 
   beforeEach(async () => {
+    context = mock(ProductContextFacade);
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, RouterTestingModule, TranslateModule.forRoot()],
       declarations: [ProductVariationSelectComponent],
+      providers: [{ provide: ProductContextFacade, useFactory: () => instance(context) }],
     }).compileComponents();
   });
 
@@ -22,48 +48,7 @@ describe('Product Variation Select Component', () => {
     component = fixture.componentInstance;
     element = fixture.nativeElement;
 
-    component.variationOptions = [
-      {
-        id: 'a1',
-        label: 'Attr 1',
-        options: [
-          {
-            label: 'A',
-            value: 'A',
-            type: 'a1',
-            alternativeCombination: false,
-            active: false,
-          },
-          {
-            label: 'B',
-            value: 'B',
-            type: 'a1',
-            alternativeCombination: false,
-            active: true,
-          },
-        ],
-      },
-      {
-        id: 'a2',
-        label: 'Attr 2',
-        options: [
-          {
-            label: 'C',
-            value: 'C',
-            type: 'a2',
-            alternativeCombination: true,
-            active: false,
-          },
-          {
-            label: 'D',
-            value: 'D',
-            type: 'a2',
-            alternativeCombination: false,
-            active: true,
-          },
-        ],
-      },
-    ];
+    when(context.select('productAsVariationProduct')).thenReturn(of(variationProduct));
   });
 
   it('should be created', () => {
@@ -73,47 +58,45 @@ describe('Product Variation Select Component', () => {
   });
 
   it('should initialize form of option groups', () => {
-    component.ngOnChanges();
     fixture.detectChanges();
 
-    expect(component.form).toBeTruthy();
+    expect(findAllDataTestingIDs(fixture)).toMatchInlineSnapshot(`
+      Array [
+        "a1",
+        "a1-A",
+        "a1-B",
+        "a2",
+        "a2-C",
+        "a2-D",
+      ]
+    `);
   });
 
   it('should set active values for form', () => {
-    component.ngOnChanges();
     fixture.detectChanges();
 
-    expect(component.form.value).toEqual({
-      a1: 'B',
-      a2: 'D',
-    });
+    expect(fixture.debugElement.query(By.css('select[data-testing-id=a1]')).nativeElement.value).toMatchInlineSnapshot(
+      `"B"`
+    );
+
+    expect(fixture.debugElement.query(By.css('select[data-testing-id=a2]')).nativeElement.value).toMatchInlineSnapshot(
+      `"D"`
+    );
   });
 
-  it('should throw event when form values change', done => {
-    component.ngOnChanges();
+  it('should trigger value change if value changes', () => {
     fixture.detectChanges();
 
-    component.selectVariation.subscribe(selection => {
-      expect(selection).toEqual({
-        changedAttribute: 'a1',
-        selection: {
-          a1: 'A',
-          a2: 'D',
-        },
-      });
-      done();
-    });
+    const select = fixture.debugElement.query(By.css('select')).nativeElement;
+    select.value = 'A';
+    select.dispatchEvent(new Event('change'));
 
-    component.form.patchValue({ a1: 'A' });
-  });
-
-  it('should apply value changes after data changed', () => {
-    component.variationOptions[0].options[1].value = 'BBB';
-    component.ngOnChanges();
-
-    expect(component.form.value).toEqual({
-      a1: 'BBB',
-      a2: 'D',
-    });
+    verify(context.changeVariationOption(anything(), anything())).once();
+    expect(capture(context.changeVariationOption).last()).toMatchInlineSnapshot(`
+      Array [
+        "a1",
+        "A",
+      ]
+    `);
   });
 });

@@ -5,9 +5,7 @@
     [product]="product"
     [quantity]="quantity"
     [category]="category"
-    [variationOptions]="productVariationOptions$ | async"
     (productToBasket)="addToBasket($event)"
-    (selectVariation)="replaceVariation($event)"
   ></ish-product-tile>
 
   <ish-product-row
@@ -17,8 +15,6 @@
     [quantity]="quantity"
     (quantityChange)="quantityChange.emit($event)"
     [category]="category"
-    [variationOptions]="productVariationOptions$ | async"
-    (selectVariation)="replaceVariation($event)"
   ></ish-product-row>
 </ng-container>
 

@@ -3,8 +3,6 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
-import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
 import {
   ProductView,
   VariationProductMasterView,
@@ -21,9 +19,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   @Input() product: ProductView | VariationProductView | VariationProductMasterView;
   @Input() quantity: number;
   @Input() price: ProductPrices;
-  @Input() variationOptions: VariationOptionGroup[];
   @Output() productToBasket = new EventEmitter<{ sku: string; quantity: number }>();
-  @Output() selectVariation = new EventEmitter<{ selection: VariationSelection; changedAttribute?: string }>();
   @Output() quantityChange = new EventEmitter<number>();
 
   productDetailForm: FormGroup;
@@ -55,9 +51,5 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       sku: this.product.sku,
       quantity: this.productDetailForm.get(this.quantityControlName).value,
     });
-  }
-
-  variationSelected(event: { selection: VariationSelection; changedAttribute?: string }) {
-    this.selectVariation.emit(event);
   }
 }

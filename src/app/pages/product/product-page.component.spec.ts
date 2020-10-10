@@ -11,7 +11,6 @@ import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { FeatureToggleModule } from 'ish-core/feature-toggle.module';
 import { createCategoryView } from 'ish-core/models/category-view/category-view.model';
 import { Category } from 'ish-core/models/category/category.model';
-import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
 import {
   VariationProductView,
   createProductView,
@@ -112,41 +111,13 @@ describe('Product Page Component', () => {
     ]);
   });
 
-  it('should redirect to product page when variation is selected', fakeAsync(() => {
-    const product = {
-      sku: '222',
-      variableVariationAttributes: [
-        { name: 'Attr 1', type: 'VariationAttribute', value: 'B', variationAttributeId: 'a1' },
-        { name: 'Attr 2', type: 'VariationAttribute', value: 'D', variationAttributeId: 'a2' },
-      ],
-      variations: () => [
-        {
-          sku: '222',
-          variableVariationAttributes: [
-            { name: 'Attr 1', type: 'VariationAttribute', value: 'B', variationAttributeId: 'a1' },
-            { name: 'Attr 2', type: 'VariationAttribute', value: 'D', variationAttributeId: 'a2' },
-          ],
-        },
-        {
-          sku: '333',
-          attributes: [{ name: 'defaultVariation', type: 'Boolean', value: true }],
-          variableVariationAttributes: [
-            { name: 'Attr 1', type: 'VariationAttribute', value: 'A', variationAttributeId: 'a1' },
-            { name: 'Attr 2', type: 'VariationAttribute', value: 'D', variationAttributeId: 'a2' },
-          ],
-          defaultCategory: noop,
-        },
-      ],
-    } as VariationProductView;
-
-    const selection: VariationSelection = {
-      a1: 'A',
-      a2: 'D',
-    };
-
+  it('should redirect to product page when product changes', fakeAsync(() => {
     fixture.detectChanges();
+    component.redirectToVariation({
+      sku: '333',
+      defaultCategory: noop,
+    } as VariationProductView);
 
-    component.variationSelected({ selection }, product);
     tick(500);
 
     expect(location.path()).toMatchInlineSnapshot(`"/sku333-catA"`);

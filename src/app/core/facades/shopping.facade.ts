@@ -25,9 +25,7 @@ import {
   getProduct,
   getProductBundleParts,
   getProductLinks,
-  getProductVariationOptions,
   getProducts,
-  getSelectedProductVariationOptions,
   loadProductIfNotLoaded,
   loadProductLinks,
 } from 'ish-core/store/shopping/products';
@@ -64,7 +62,6 @@ export class ShoppingFacade {
   // PRODUCT
 
   selectedProductId$ = this.store.pipe(select(selectRouteParam('sku')));
-  selectedProductVariationOptions$ = this.store.pipe(select(getSelectedProductVariationOptions));
 
   product$(sku: string | Observable<string>, level: ProductCompletenessLevel) {
     return toObservable(sku).pipe(
@@ -80,12 +77,6 @@ export class ShoppingFacade {
 
   products$(skus: string[]) {
     return this.store.pipe(select(getProducts, { skus }));
-  }
-
-  productVariationOptions$(sku: string | Observable<string>) {
-    return toObservable(sku).pipe(
-      switchMap(plainSKU => this.store.pipe(select(getProductVariationOptions, { sku: plainSKU })))
-    );
   }
 
   productBundleParts$(sku: string) {

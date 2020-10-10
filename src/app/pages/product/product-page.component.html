@@ -9,9 +9,7 @@
         [product]="product"
         [price]="price$ | async"
         [(quantity)]="quantity"
-        [variationOptions]="productVariationOptions$ | async"
         (productToBasket)="addToBasket()"
-        (selectVariation)="variationSelected($event, product)"
       ></ish-product-detail>
 
       <ish-product-master-variations

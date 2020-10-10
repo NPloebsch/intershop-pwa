@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng-mocks';
 import { of } from 'rxjs';
-import { anything, capture, instance, mock, spy, verify, when } from 'ts-mockito';
+import { anything, capture, instance, mock, verify, when } from 'ts-mockito';
 
 import { ProductContextFacade } from 'ish-core/facades/product-context.facade';
-import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { VariationProductView } from 'ish-core/models/product-view/product-view.model';
 import { LoadingComponent } from 'ish-shared/components/common/loading/loading.component';
 import { ProductRowComponent } from 'ish-shared/components/product/product-row/product-row.component';
@@ -16,11 +15,9 @@ describe('Product Item Component', () => {
   let component: ProductItemComponent;
   let fixture: ComponentFixture<ProductItemComponent>;
   let element: HTMLElement;
-  let shoppingFacade: ShoppingFacade;
   let context: ProductContextFacade;
 
   beforeEach(async () => {
-    shoppingFacade = mock(ShoppingFacade);
     context = mock(ProductContextFacade);
     await TestBed.configureTestingModule({
       declarations: [
@@ -29,7 +26,6 @@ describe('Product Item Component', () => {
         MockComponent(ProductTileComponent),
         ProductItemComponent,
       ],
-      providers: [{ provide: ShoppingFacade, useFactory: () => instance(shoppingFacade) }],
     })
       .overrideComponent(ProductItemComponent, {
         set: { providers: [{ provide: ProductContextFacade, useFactory: () => instance(context) }] },
@@ -76,34 +72,6 @@ describe('Product Item Component', () => {
           3,
         ]
       `);
-    });
-
-    describe('when changing variation', () => {
-      it('should trigger product sku change when sku is changing', () => {
-        expect(() => fixture.detectChanges()).not.toThrow();
-
-        const emitter = spy(component.productSkuChange);
-
-        component.replaceVariation({ selection: { HDD: '256' } });
-
-        verify(emitter.emit(anything())).once();
-        const [sku] = capture(emitter.emit).last();
-        expect(sku).toMatchInlineSnapshot(`"skuV2"`);
-      });
-
-      it('should trigger add product to cart with right sku', () => {
-        expect(() => fixture.detectChanges()).not.toThrow();
-
-        component.replaceVariation({ selection: { HDD: '256' } });
-        component.addToBasket(4);
-
-        verify(context.addToBasket(anything())).once();
-        expect(capture(context.addToBasket).last()).toMatchInlineSnapshot(`
-          Array [
-            4,
-          ]
-        `);
-      });
     });
   });
 });

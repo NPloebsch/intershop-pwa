@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CategoryView } from 'ish-core/models/category-view/category-view.model';
-import { VariationOptionGroup } from 'ish-core/models/product-variation/variation-option-group.model';
-import { VariationSelection } from 'ish-core/models/product-variation/variation-selection.model';
 import {
   ProductView,
   VariationProductMasterView,
@@ -32,20 +30,14 @@ export class ProductTileComponent {
   @Input() configuration: Partial<ProductTileComponentConfiguration> = {};
   @Input() product: ProductView | VariationProductView | VariationProductMasterView;
   @Input() quantity: number;
-  @Input() variationOptions: VariationOptionGroup[];
   @Input() category: CategoryView;
   @Output() productToBasket = new EventEmitter<number>();
-  @Output() selectVariation = new EventEmitter<{ selection: VariationSelection; changedAttribute?: string }>();
 
   isMasterProduct = ProductHelper.isMasterProduct;
   isVariationProduct = ProductHelper.isVariationProduct;
 
   addToBasket() {
     this.productToBasket.emit(this.quantity || this.product.minOrderQuantity);
-  }
-
-  variationSelected(event: { selection: VariationSelection; changedAttribute?: string }) {
-    this.selectVariation.emit(event);
   }
 
   get variationCount() {
