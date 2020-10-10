@@ -38,6 +38,7 @@ export class ProductTileComponent {
   @Output() selectVariation = new EventEmitter<{ selection: VariationSelection; changedAttribute?: string }>();
 
   isMasterProduct = ProductHelper.isMasterProduct;
+  isVariationProduct = ProductHelper.isVariationProduct;
 
   addToBasket() {
     this.productToBasket.emit(this.quantity || this.product.minOrderQuantity);
