@@ -1,27 +1,30 @@
-<div class="cookie-consent-modal">
+<div class="cookies-modal">
   <div class="modal-header">
     <h2>{{ 'cookie.preferences.heading' | translate }}</h2>
-    <button type="button" class="close close-modal" (click)="hide()">
+    <button
+      type="button"
+      class="close"
+      [title]="'dialog.close.text' | translate"
+      [attr.aria-label]="'dialog.close.text' | translate"
+      (click)="hide()"
+    >
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
 
   <div class="modal-body">
-    <ng-container *ngFor="let option of cookieConsentOptions?.options">
-      <p>
-        <label>
-          <input
-            type="checkbox"
-            [checked]="option.required || cookieConsentSettings?.enabledOptions.includes(option.id)"
-            [disabled]="option.required"
-            (change)="selectedIds[option.id] = !selectedIds[option.id]"
-          />
-          <b>{{ option.name | translate }}</b>
-        </label>
-        <br />
-        {{ option.description | translate }}
-      </p>
-    </ng-container>
+    <div *ngFor="let option of cookieConsentOptions?.options" class="cookie-option">
+      <label>
+        <input
+          type="checkbox"
+          [checked]="option.required || cookieConsentSettings?.enabledOptions.includes(option.id)"
+          [disabled]="option.required"
+          (change)="selectedIds[option.id] = !selectedIds[option.id]"
+        />
+        <span>{{ option.name | translate }}</span>
+      </label>
+      <p>{{ option.description | translate }}</p>
+    </div>
   </div>
 
   <div class="modal-footer">
