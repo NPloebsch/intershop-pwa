@@ -70,7 +70,7 @@ export class UserService {
 
   signinUserByToken(): Observable<CustomerUserType> {
     return this.apiService
-      .get<CustomerData>('customers/-', { skipApiErrorHandling: true, runExclusively: true })
+      .get<CustomerData>('privatecustomers/-', { skipApiErrorHandling: true, runExclusively: true })
       .pipe(
         retryWhen(errors =>
           errors.pipe(
@@ -78,11 +78,6 @@ export class UserService {
               error.status === 401 && error.code === 'user.not.authenticated' ? timer(1000) : throwError(error)
             )
           )
-        ),
-        withLatestFrom(this.appFacade.isAppTypeREST$),
-        concatMap(([data, isAppTypeRest]) =>
-          // ToDo: #IS-30018 use the customer type for this decision
-          isAppTypeRest && !data.companyName ? this.apiService.get<CustomerData>('privatecustomers/-') : of(data)
         ),
         map(CustomerMapper.mapLoginData),
         catchError(() => EMPTY)

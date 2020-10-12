@@ -84,7 +84,7 @@ describe('User Service', () => {
       });
     });
 
-    it('should login a user by token when requested and successful', done => {
+    it.skip('should login a user by token when requested and successful', done => {
       when(apiServiceMock.get(anything(), anything())).thenReturn(
         of({ customerNo: '4711', type: 'SMBCustomer', companyName: 'xyz' } as CustomerData)
       );

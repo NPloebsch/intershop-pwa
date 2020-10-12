@@ -23,10 +23,10 @@
       >
     </a>
     <span class="separator" [ngClass]="getViewClasses()">&#124;</span>
-    <a routerLink="/logout" class="my-account-link my-account-logout" data-testing-id="link-logout">
-      <span [ngClass]="getViewClasses()">{{ 'account.logout.link' | translate }}</span>
-    </a>
   </ng-container>
+  <a routerLink="/logout" class="my-account-link my-account-logout" data-testing-id="link-logout">
+    <span [ngClass]="getViewClasses()">{{ 'account.logout.link' | translate }}</span>
+  </a>
   <!-- not logged in -->
   <ng-template #notLoggedIn>
     <a

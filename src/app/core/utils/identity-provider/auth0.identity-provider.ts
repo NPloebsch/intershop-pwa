@@ -1,15 +1,15 @@
 import { Location } from '@angular/common';
-import { HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
-import { first, take } from 'rxjs/operators';
+import { first, switchMap, switchMapTo, tap } from 'rxjs/operators';
 
 import { ApiService } from 'ish-core/services/api/api.service';
-import { getPreferredShipToAddress, loadAddresses } from 'ish-core/store/customer/addresses';
-import { getLoggedInUser, loadUserByAPIToken } from 'ish-core/store/customer/user';
+import { getRestEndpoint } from 'ish-core/store/core/configuration';
+import { getUserAuthorized, loadUserByAPIToken } from 'ish-core/store/customer/user';
 import { whenTruthy } from 'ish-core/utils/operators';
 
 import { IdentityProvider } from './identity-provider.interface';
@@ -26,7 +26,8 @@ export class Auth0IdentityProvider implements IdentityProvider {
     private oauthService: OAuthService,
     private router: Router,
     private store: Store,
-    private location: Location
+    private location: Location,
+    private http: HttpClient
   ) {}
 
   getCapabilities() {
@@ -72,19 +73,33 @@ export class Auth0IdentityProvider implements IdentityProvider {
     this.oauthService.setupAutomaticSilentRefresh();
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
     if (this.oauthService.getIdToken()) {
-      this.store.dispatch(loadUserByAPIToken());
-      this.store.pipe(select(getLoggedInUser), whenTruthy(), first()).subscribe(() => {
-        this.store.dispatch(loadAddresses());
-      });
-    }
+      console.log('ID-Token', this.oauthService.getIdToken());
 
-    this.store.pipe(select(getPreferredShipToAddress), whenTruthy(), take(1)).subscribe(address => {
-      if (!address.addressLine1) {
-        this.router.navigateByUrl('/complete-profile');
-      } else if (this.location.path().startsWith('/loading')) {
-        this.router.navigateByUrl('/account');
-      }
-    });
+      this.store
+        .pipe(
+          select(getRestEndpoint),
+          whenTruthy(),
+          first(),
+          switchMap(rest =>
+            this.http
+              .post(`${rest}/users/processtoken`, {
+                id_token: this.oauthService.getIdToken(),
+                options: ['CREATE_USER', 'CREATE_CUSTOMER'],
+              })
+              .pipe(
+                tap(() => {
+                  this.store.dispatch(loadUserByAPIToken());
+                })
+              )
+          ),
+          switchMapTo(this.store.pipe(select(getUserAuthorized), whenTruthy(), first()))
+        )
+        .subscribe(() => {
+          if (this.location.path().startsWith('/loading')) {
+            this.router.navigateByUrl('/account');
+          }
+        });
+    }
   }
 
   async triggerLogin() {
